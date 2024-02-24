@@ -1,5 +1,5 @@
 [package]
-name = "rust-end-to-end-application"
+name = "hw-monitor-aligment"
 # don't change this, it's updated before an actual build by update-version.sh
 version = "0.0.0-development"
 edition = "2021"
@@ -9,7 +9,7 @@ description = "Rust end-to-end application"
 license-file = "LICENSE"
 categories = ["starter", "end-to-end"]
 keywords = ["integrity", "end-to-end", "starter", "docker", "release"]
-repository = "https://github.com/kristof-mattei/rust-end-to-end-application"
+repository = "https://github.com/kristof-mattei/hw-monitor-aligment"
 
 [lints.clippy]
 # don't stop from compiling / running
@@ -32,7 +32,16 @@ opt-level = 3
 coverage = []
 
 [dependencies]
+backtrace = "0.3.69"
 color-eyre = "0.6.2"
+cxx = "1.0.117"
+cxx-qt = "0.6.0"
+cxx-qt-lib = "0.6.0"
+
+[build-dependencies]
+cxx-qt-build = "0.6.0"
+cxx-qt-lib-headers = "0.6.0"
+
 # reqwest = { version = "0.11.5", features = ["json"] }
 # serde_json = "1.0.68"
 # serde = { version = "1.0.130", features = ["derive"] }

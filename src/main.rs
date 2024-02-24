@@ -1,69 +1,22 @@
-// use std::path::PathBuf;
+pub mod cxxqt_object;
 
-// use env_logger::Env;
-// use futures::{stream::FuturesUnordered, StreamExt};
-// use log::info;
-
-// use structopt::StructOpt;
-
-// #[derive(Debug, StructOpt)]
-// #[structopt(
-//     // name, // from Cargo.toml,
-//     about, // needed otherwise it doesn't show description from Cargo.toml,
-//     author // needed otherwise it doesn't show author from Cargo.toml
-// )]
-// struct Opt {
-//     #[structopt(
-//         // verbatim_doc_comment,
-//         help = "Some help",
-//         parse(from_os_str)
-//     )]
-//     some_value: PathBuf,
-// }
-
-fn foo() -> &'static str {
-    "Foo"
-}
-
-fn bar() -> &'static str {
-    "Bar"
-}
-
-fn quz() -> &'static str {
-    "Quz"
-}
+use cxx_qt_lib::{QGuiApplication, QQmlApplicationEngine, QUrl};
 
 fn main() -> Result<(), color_eyre::Report> {
     color_eyre::install()?;
+    // Create the application and engine
+    let mut app = QGuiApplication::new();
+    let mut engine = QQmlApplicationEngine::new();
 
-    println!("{}", foo());
-    println!("{}", bar());
-    println!("{}", quz());
-
-    todo!("TODO");
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{bar, foo, quz};
-
-    #[test]
-    fn assert_foo() {
-        assert_eq!(foo(), "Foo");
+    // Load the QML path into the engine
+    if let Some(engine) = engine.as_mut() {
+        engine.load(&QUrl::from("qrc:/main.qml"));
     }
 
-    #[test]
-    fn assert_bar() {
-        assert_eq!(bar(), "Bar");
+    // Start the app
+    if let Some(app) = app.as_mut() {
+        app.exec();
     }
 
-    #[test]
-    fn assert_quz() {
-        assert_eq!(quz(), "Quz");
-    }
-
-    #[test]
-    fn assert_combined() {
-        assert_eq!(format!("{}-{}-{}", foo(), bar(), quz()), "Foo-Bar-Quz");
-    }
+    Ok(())
 }
