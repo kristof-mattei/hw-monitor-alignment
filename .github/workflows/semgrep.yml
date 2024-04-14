@@ -19,32 +19,22 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: returntocorp/semgrep:1.62.0@sha256:7f817a27f8322550e5569750079c10bdecf90284afb660edc5bb27a4b252d928
+      image: returntocorp/semgrep:1.68.0@sha256:bacb1190716dab2b1708dc63c5bf11f6014c16511e5117f83592acbc5530087a
 
     steps:
-      - name: Check out repo
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Checkout
+        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
         with:
           show-progress: false
 
       - name: Run semgrep
-        shell: bash
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
         run: |
           semgrep ci --sarif --output=semgrep.sarif
 
-      - name: Fixup semgrep.sarif's startColumn==0 and/or endColumn==0
-        shell: bash
-        run: |
-          jq '.' semgrep.sarif > normalized.sarif
-          jq 'del(.runs[].results[].locations[].physicalLocation.region | select(.startColumn==0) | .startColumn)' normalized.sarif > fixed_start_column.sarif
-          jq 'del(.runs[].results[].locations[].physicalLocation.region | select(.endColumn==0) | .endColumn)' fixed_start_column.sarif > fixed_start_end_column.sarif
-
-          diff normalized.sarif fixed_start_end_column.sarif || true
-
       - name: Upload SARIF file for GitHub Advanced Security Dashboard
         if: always()
-        uses: github/codeql-action/upload-sarif@379614612a29c9e28f31f39a59013eb8012a51f0 # v3.24.3
+        uses: github/codeql-action/upload-sarif@4355270be187e1b672a7a1c7c7bae5afdc1ab94a # v3.24.10
         with:
-          sarif_file: fixed_start_end_column.sarif
+          sarif_file: semgrep.sarif

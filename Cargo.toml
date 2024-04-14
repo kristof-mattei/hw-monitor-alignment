@@ -3,7 +3,7 @@ name = "hw-monitor-aligment"
 # don't change this, it's updated before an actual build by update-version.sh
 version = "0.0.0-development"
 edition = "2021"
-rust-version = "1.76.0"
+rust-version = "1.77.2"
 authors = ["Kristof Mattei"]
 description = "Rust end-to-end application"
 license-file = "LICENSE"
@@ -32,25 +32,15 @@ opt-level = 3
 coverage = []
 
 [dependencies]
-backtrace = "0.3.69"
-color-eyre = "0.6.2"
-cxx = "1.0.117"
+backtrace = "0.3.71"
+color-eyre = "0.6.3"
+cxx = "1.0.121"
 cxx-qt = "0.6.0"
 cxx-qt-lib = "0.6.0"
 
 [build-dependencies]
 cxx-qt-build = "0.6.0"
 cxx-qt-lib-headers = "0.6.0"
-
-# reqwest = { version = "0.11.5", features = ["json"] }
-# serde_json = "1.0.68"
-# serde = { version = "1.0.130", features = ["derive"] }
-# futures = "0.3.17"
-# tokio = { version = "1.12.0", features = ["full"] }
-# log = "0.4.14"
-# env_logger = "0.9.0"
-# serde_yaml = "0.8.21"
-# clap = { version = "3.0.14", features = ["derive"] }
 
 # We compile the Docker container with musl to get a static library. Smaller, faster.
 # BUT that means that we need to include openssl

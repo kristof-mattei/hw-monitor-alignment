@@ -2,7 +2,7 @@
 pub mod my_object {
 
     unsafe extern "RustQt" {
-        #[qobject]
+        #[qobject()]
         #[qml_element]
         type Hello = super::HelloRust;
     }
@@ -18,6 +18,6 @@ pub struct HelloRust {}
 
 impl my_object::Hello {
     pub fn say_hello(&self) {
-        println!("Hello world!")
+        println!("Hello world!");
     }
 }
