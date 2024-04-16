@@ -112,7 +112,7 @@ jobs:
 
           cargo --version
 
-          apt install --yes qt6-base-dev
+          apt install --yes qt6-declarative-dev
 
       - name: Get binstall
         shell: bash
@@ -193,6 +193,8 @@ jobs:
 
           cargo --version
 
+          apt install --yes qt6-declarative-dev
+
       - name: Build
         shell: bash
         run: |
@@ -239,6 +241,8 @@ jobs:
 
           cargo --version
 
+          apt install --yes qt6-declarative-dev
+
       - name: Check formatting
         shell: bash
         run: |
@@ -282,6 +286,8 @@ jobs:
           rustup update
 
           cargo --version
+
+          apt install --yes qt6-declarative-dev
 
       - name: Install llvm-tools-preview
         shell: bash
@@ -397,6 +403,8 @@ jobs:
           rustup update
 
           cargo --version
+
+          apt install --yes qt6-declarative-dev
 
       - name: Run Clippy for GitHub Actions report
         uses: actions-rs-plus/clippy-check@30fef0f891edb491831cd248156cfb18d7d12fda # v2.2.0
