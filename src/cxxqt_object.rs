@@ -2,7 +2,7 @@
 pub mod my_object {
 
     unsafe extern "RustQt" {
-        #[qobject()]
+        #[qobject]
         #[qml_element]
         type Hello = super::HelloRust;
     }

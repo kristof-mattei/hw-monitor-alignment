@@ -39,7 +39,7 @@ cxx-qt = "0.6.0"
 cxx-qt-lib = "0.6.0"
 
 [build-dependencies]
-cxx-qt-build = "0.6.0"
+cxx-qt-build = { version = "0.6.0", features = ["link_qt_object_files"] }
 cxx-qt-lib-headers = "0.6.0"
 
 # We compile the Docker container with musl to get a static library. Smaller, faster.
