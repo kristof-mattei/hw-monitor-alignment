@@ -17,7 +17,8 @@ RUN --mount=type=cache,target=/var/cache/apt --mount=type=cache,target=/var/lib/
     musl-dev \
     musl-tools \
     libc6-dev-arm64-cross \
-    gcc-aarch64-linux-gnu
+    gcc-aarch64-linux-gnu \
+    qt6-declarative-dev
 
 # The following block
 # creates an empty app, and we copy in Cargo.toml and Cargo.lock as they represent our dependencies

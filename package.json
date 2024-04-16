@@ -1,5 +1,5 @@
 {
-  "name": "hw-monitor-aligment",
+  "name": "hw-monitor-alignment",
   "version": "0.0.0-development",
   "description": "It's written in Rust!",
   "main": "src/main.rs",
@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/kristof-mattei/hw-monitor-aligment.git"
+    "url": "https://github.com/kristof-mattei/hw-monitor-alignment.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/kristof-mattei/hw-monitor-aligment/issues"
+    "url": "https://github.com/kristof-mattei/hw-monitor-alignment/issues"
   },
-  "homepage": "https://github.com/kristof-mattei/hw-monitor-aligment#readme",
+  "homepage": "https://github.com/kristof-mattei/hw-monitor-alignment#readme",
   "devDependencies": {
     "@actions/tool-cache": "2.0.1",
     "@semantic-release/changelog": "6.0.3",
