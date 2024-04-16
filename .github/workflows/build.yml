@@ -112,6 +112,8 @@ jobs:
 
           cargo --version
 
+          apt install --yes qt6-base-dev
+
       - name: Get binstall
         shell: bash
         run: |
