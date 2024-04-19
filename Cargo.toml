@@ -36,7 +36,7 @@ backtrace = "0.3.71"
 color-eyre = "0.6.3"
 cxx = "1.0.121"
 cxx-qt = "0.6.1"
-cxx-qt-lib = "0.6.0"
+cxx-qt-lib = "0.6.1"
 
 [build-dependencies]
 cxx-qt-build = { version = "0.6.0", features = ["link_qt_object_files"] }
