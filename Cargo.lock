@@ -144,9 +144,9 @@ dependencies = [
 
 [[package]]
 name = "cxx-qt"
-version = "0.6.0"
+version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a9a68e547fffeea723c374cd104a13e75bc67b3cdfbd2c0ad82769e0084d94ec"
+checksum = "08aa6cda7588b6d17c563b0d2fadc060d4204d04908c0f359ae288857091218d"
 dependencies = [
  "cxx",
  "cxx-qt-macro",
@@ -173,9 +173,9 @@ dependencies = [
 
 [[package]]
 name = "cxx-qt-gen"
-version = "0.6.0"
+version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bfce7e8223d0a10e442f56843090b3e2e3e58773e9d5be569452406802c0cdcc"
+checksum = "ede7c73dbfbcc234d8826919e257830c1789db2cac586546a87d2a82e3cbe5d5"
 dependencies = [
  "clang-format",
  "convert_case",
@@ -205,9 +205,9 @@ checksum = "aa88798ca1426b33bd772834ac718469e9a9f33d0363a17350034d15cc1609f4"
 
 [[package]]
 name = "cxx-qt-macro"
-version = "0.6.0"
+version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "52e9ba5202d3b276f5b52d09d07b6476d0ef37950fd7c60c14f3e9f0e855930d"
+checksum = "699e8a668c03b03419b084960d72eed253632bb16349b33fd0a0c893b61b664c"
 dependencies = [
  "cxx-qt-gen",
  "proc-macro2",
