@@ -35,7 +35,7 @@ coverage = []
 backtrace = "0.3.71"
 color-eyre = "0.6.3"
 cxx = "1.0.121"
-cxx-qt = "0.6.0"
+cxx-qt = "0.6.1"
 cxx-qt-lib = "0.6.0"
 
 [build-dependencies]
