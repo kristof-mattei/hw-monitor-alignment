@@ -40,7 +40,7 @@ cxx-qt-lib = "0.6.1"
 
 [build-dependencies]
 cxx-qt-build = { version = "0.6.1", features = ["link_qt_object_files"] }
-cxx-qt-lib-headers = "0.6.0"
+cxx-qt-lib-headers = "0.6.1"
 
 # We compile the Docker container with musl to get a static library. Smaller, faster.
 # BUT that means that we need to include openssl
