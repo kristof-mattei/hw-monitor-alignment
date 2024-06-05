@@ -36,7 +36,7 @@ backtrace = "0.3.72"
 color-eyre = { git = "https://github.com/kristof-mattei/eyre", branch = "bump-backtrace-rs", features = [
     "track-caller",
 ] }
-cxx = "1.0.122"
+cxx = "1.0.123"
 cxx-qt = "0.6.1"
 cxx-qt-lib = "0.6.1"
 
