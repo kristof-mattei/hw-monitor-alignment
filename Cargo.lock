@@ -34,9 +34,9 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.0.98"
+version = "1.0.99"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "41c270e7540d725e65ac7f1b212ac8ce349719624d7bcff99f8e2e488e8cf03f"
+checksum = "96c51067fd44124faa7f870b4b1c969379ad32b2ba805aa959430ceaa384f695"
 dependencies = [
  "jobserver",
  "libc",
@@ -116,9 +116,9 @@ dependencies = [
 
 [[package]]
 name = "cxx-build"
-version = "1.0.122"
+version = "1.0.123"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9327c7f9fbd6329a200a5d4aa6f674c60ab256525ff0084b52a889d4e4c60cee"
+checksum = "1e8df9a089caae66634d754672d5f909395f30f38af6ff19366980d8a8b57501"
 dependencies = [
  "cc",
  "codespan-reporting",
@@ -131,9 +131,9 @@ dependencies = [
 
 [[package]]
 name = "cxx-gen"
-version = "0.7.122"
+version = "0.7.123"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a476ac5d29b1957ad93669eef9a030e9fc139103f9bb1ff9f15504c3f21236b0"
+checksum = "815c5db00477e66d8819915be809baab3c4ed81e064a8bd514584dc21f3f97c7"
 dependencies = [
  "codespan-reporting",
  "proc-macro2",
@@ -535,9 +535,9 @@ checksum = "d4c87d22b6e3f4a18d4d40ef354e97c90fcb14dd91d7dc0aa9d8a1172ebf7202"
 
 [[package]]
 name = "unicode-width"
-version = "0.1.12"
+version = "0.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "68f5e5f3158ecfd4b8ff6fe086db7c8467a2dfdac97fe420f2b7c4aa97af66d6"
+checksum = "0336d538f7abc86d282a4189614dfaa90810dfc2c6f6427eaf88e16311dd225d"
 
 [[package]]
 name = "valuable"
