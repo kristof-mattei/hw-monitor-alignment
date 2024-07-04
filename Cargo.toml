@@ -5,10 +5,10 @@ version = "0.0.0-development"
 edition = "2021"
 rust-version = "1.79.0"
 authors = ["Kristof Mattei"]
-description = "Rust end-to-end application"
+description = "Rust seed application"
 license-file = "LICENSE"
-categories = ["starter", "end-to-end"]
-keywords = ["integrity", "end-to-end", "starter", "docker", "release"]
+categories = ["starter", "seed"]
+keywords = ["integrity", "seed", "starter", "docker", "release"]
 repository = "https://github.com/kristof-mattei/hw-monitor-alignment"
 
 [lints.clippy]
