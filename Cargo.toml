@@ -37,11 +37,11 @@ color-eyre = { git = "https://github.com/eyre-rs/eyre", rev = "2dc0688d33a487009
     "track-caller",
 ] }
 cxx = "1.0.130"
-cxx-qt = "0.6.1"
-cxx-qt-lib = "0.6.1"
+cxx-qt = "0.7.0"
+cxx-qt-lib = "0.7.0"
 
 [build-dependencies]
-cxx-qt-build = { version = "0.6.1", features = ["link_qt_object_files"] }
+cxx-qt-build = { version = "0.7.0", features = ["link_qt_object_files"] }
 cxx-qt-lib-headers = "0.6.1"
 
 # We compile the Docker container with musl to get a static library. Smaller, faster.
