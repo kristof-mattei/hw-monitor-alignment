@@ -38,7 +38,7 @@ color-eyre = { git = "https://github.com/eyre-rs/eyre", rev = "2dc0688d33a487009
 ] }
 cxx = "1.0.130"
 cxx-qt = "0.6.1"
-cxx-qt-lib = "0.6.1"
+cxx-qt-lib = "0.7.0"
 
 [build-dependencies]
 cxx-qt-build = { version = "0.6.1", features = ["link_qt_object_files"] }
