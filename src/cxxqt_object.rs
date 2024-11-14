@@ -1,4 +1,3 @@
-#[allow(clippy::unnecessary_box_returns)]
 #[cxx_qt::bridge]
 pub mod my_object {
 

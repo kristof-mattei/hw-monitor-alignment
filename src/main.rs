@@ -1,3 +1,4 @@
+#[allow(clippy::unnecessary_box_returns)]
 pub mod cxxqt_object;
 
 use cxx_qt_lib::{QGuiApplication, QQmlApplicationEngine, QUrl};
