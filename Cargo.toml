@@ -37,7 +37,7 @@ color-eyre = { git = "https://github.com/eyre-rs/eyre", rev = "2dc0688d33a487009
     "track-caller",
 ] }
 cxx = "1.0.130"
-cxx-qt = "0.6.1"
+cxx-qt = "0.7.0"
 cxx-qt-lib = "0.6.1"
 
 [build-dependencies]
