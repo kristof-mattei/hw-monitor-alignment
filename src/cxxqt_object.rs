@@ -1,14 +1,16 @@
 #[cxx_qt::bridge]
-pub mod my_object {
+pub mod qobject {
 
     unsafe extern "RustQt" {
         #[qobject]
         #[qml_element]
+        #[namespace = "my_object"]
         type Hello = super::HelloRust;
     }
 
     unsafe extern "RustQt" {
         #[qinvokable]
+        #[cxx_name = "sayHello"]
         pub fn say_hello(self: &Hello);
     }
 }
@@ -16,7 +18,7 @@ pub mod my_object {
 #[derive(Default)]
 pub struct HelloRust {}
 
-impl my_object::Hello {
+impl qobject::Hello {
     pub fn say_hello(&self) {
         println!("Hello world!");
     }
