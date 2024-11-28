@@ -1,10 +1,12 @@
-#[allow(clippy::unnecessary_box_returns)]
-pub mod cxxqt_object;
-
 use cxx_qt_lib::{QGuiApplication, QQmlApplicationEngine, QUrl};
+use hw_monitor_alignment::init_resources;
 
 fn main() -> Result<(), color_eyre::Report> {
     color_eyre::install()?;
+
+    // IF YOU REMOVE THIS LINE IT'LL BREAK
+    init_resources();
+
     // Create the application and engine
     let mut app = QGuiApplication::new();
     let mut engine = QQmlApplicationEngine::new();
@@ -20,4 +22,16 @@ fn main() -> Result<(), color_eyre::Report> {
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    #[expect(unused)]
+    use hw_monitor_alignment::init_resources;
+
+    #[test]
+    fn another_test() {
+        let one_less_kid = "👨‍👩‍👦‍👦".chars().take(5).collect::<String>();
+        assert_eq!(one_less_kid, "👨‍👩‍👦");
+    }
 }
