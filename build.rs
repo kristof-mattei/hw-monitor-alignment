@@ -1,20 +1,69 @@
+use std::env;
+use std::fs::OpenOptions;
+use std::io::Write;
+use std::path::PathBuf;
+
 use cxx_qt_build::{CxxQtBuilder, QmlModule};
 
 fn main() {
-    CxxQtBuilder::new()
-        // Link Qt's Network library
-        // - Qt Core is always linked
-        // - Qt Gui is linked by enabling the qt_gui Cargo feature (default).
-        // - Qt Qml is linked by enabling the qt_qml Cargo feature (default).
-        // - Qt Qml requires linking Qt Network on macOS
-        // if mac
-        // .qt_module("Network")
-        .qml_module(QmlModule {
-            uri: "hw_monitor_alignment",
-            rust_files: &["src/cxxqt_object.rs"],
-            qml_files: &["qml/main.qml"],
-            // qrc_files: &["qml/qml.qrc"],
-            ..Default::default()
-        })
-        .build();
+    let modules = [QmlModule {
+        uri: "hw_monitor_alignment",
+        version_major: 1,
+        version_minor: 0,
+        rust_files: &["src/cxxqt_object.rs"],
+        qml_files: &["qml/main.qml"],
+        ..Default::default()
+    }];
+
+    let mut builder = CxxQtBuilder::new().cc_builder(|cc| {
+        let start = r#"#include <QtPlugin>
+
+void _init_qt_resources() {
+    std::fprintf(stderr, "Initializing plugins...\n");
+            "#;
+
+        let end = r#"
+    std::fprintf(stderr, "Done initializing plugins...\n");
+}
+
+extern "C" {
+    void init_qt_resources() {
+        _init_qt_resources();
+    }
+}
+            "#;
+
+        let mut cpp_directory = PathBuf::from(env::var("OUT_DIR").unwrap());
+        cpp_directory.push("cxx-qt-gen/src");
+
+        std::fs::create_dir_all(&cpp_directory).expect("Couldn't create dir");
+
+        let cpp_file = cpp_directory.join("init_hack.cpp");
+
+        let mut file = OpenOptions::new()
+            .read(true)
+            .write(true)
+            .truncate(true)
+            .create(true)
+            .open(&cpp_file)
+            .expect("Couldn't create file");
+
+        writeln!(file, "{}", start).expect("Failed to write start");
+
+        for m in &modules {
+            writeln!(file, "    Q_IMPORT_PLUGIN({}_plugin)", m.uri).expect("Failed to write piece");
+        }
+
+        writeln!(file, "{}", end).expect("Failed to write end");
+
+        cc.file(cpp_file);
+    });
+
+    for m in modules {
+        builder = builder.qml_module(m);
+    }
+    // if mac
+    // .qt_module("Network")
+
+    builder.build();
 }
