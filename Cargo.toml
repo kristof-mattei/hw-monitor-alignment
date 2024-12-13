@@ -36,7 +36,7 @@ backtrace = "0.3.74"
 color-eyre = { git = "https://github.com/eyre-rs/eyre", rev = "2dc0688d33a487009e8bc3222cbab135261383b0", features = [
     "track-caller",
 ] }
-cxx = "1.0.133"
+cxx = "1.0.134"
 cxx-qt = "0.7.0"
 cxx-qt-lib = { version = "0.7.0", features = ["qt_full"] }
 
