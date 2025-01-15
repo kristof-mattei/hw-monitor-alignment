@@ -16,6 +16,17 @@ fn main() -> Result<(), color_eyre::Report> {
         engine.load(&QUrl::from("qrc:/qt/qml/hw_monitor_alignment/qml/main.qml"));
     }
 
+    if let Some(engine) = engine.as_mut() {
+        // doesn't seem to work?
+        // Listen to a signal from the QML Engine
+        engine
+            .as_qqmlengine()
+            .on_quit(|_| {
+                println!("QML Quit!");
+            })
+            .release();
+    }
+
     // Start the app
     if let Some(app) = app.as_mut() {
         app.exec();

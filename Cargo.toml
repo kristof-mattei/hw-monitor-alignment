@@ -14,8 +14,15 @@ repository = "https://github.com/kristof-mattei/hw-monitor-alignment"
 [lints.clippy]
 # don't stop from compiling / running
 all = "warn"
-pedantic = "warn"
 cargo = "warn"
+complexity = "warn"
+correctness = "warn"
+pedantic = "warn"
+perf = "warn"
+# restriction = "warn"
+style = "warn"
+suspicious = "warn"
+
 # this one causes confusion when combining variables (`foo`) and
 # dereferenced variables (`foo.bar`). The latter cannot be inlined
 # so we don't inline anything
@@ -36,7 +43,7 @@ backtrace = "0.3.74"
 color-eyre = { git = "https://github.com/eyre-rs/eyre", rev = "2dc0688d33a487009e8bc3222cbab135261383b0", features = [
     "track-caller",
 ] }
-cxx = "1.0.136"
+cxx = "1.0.137"
 cxx-qt = "0.7.0"
 cxx-qt-lib = { version = "0.7.0", features = ["qt_full"] }
 
@@ -47,5 +54,5 @@ cxx-qt-build = { version = "0.7.0", features = ["link_qt_object_files"] }
 # BUT that means that we need to include openssl
 # Documentation on the syntax:
 # https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#platform-specific-dependencies
-[target.'cfg(all(target_arch = "x86_64", target_os="linux", target_env="musl"))'.dependencies]
+# [target.'cfg(all(any(target_arch="x86_64", target_arch="aarch64"), target_os="linux", target_env="musl"))'.dependencies]
 # openssl = { version = "0.10.36", features = ["vendored"] }
