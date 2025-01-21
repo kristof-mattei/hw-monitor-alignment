@@ -1,31 +1,31 @@
 {
-    "name": "hw-monitor-alignment",
-    "version": "0.0.0-development",
-    "description": "It's written in Rust!",
-    "main": "src/main.rs",
-    "scripts": {
-        "format": "prettier --write .",
-        "release": "semantic-release"
-    },
-    "engines": {
-        "node": ">=22.13.1",
-        "npm": ">=11.0.0"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/kristof-mattei/hw-monitor-alignment.git"
-    },
-    "author": "",
-    "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/kristof-mattei/hw-monitor-alignment/issues"
-    },
-    "homepage": "https://github.com/kristof-mattei/hw-monitor-alignment#readme",
-    "devDependencies": {
-        "@actions/tool-cache": "2.0.2",
-        "prettier": "3.4.2"
-    },
-    "publishConfig": {
-        "access": "restricted"
-    }
+  "name": "hw-monitor-alignment",
+  "version": "0.0.0-development",
+  "description": "It's written in Rust!",
+  "main": "src/main.rs",
+  "scripts": {
+    "format": "prettier --write .",
+    "release": "semantic-release"
+  },
+  "engines": {
+    "node": ">=22.13.1",
+    "npm": ">=11.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kristof-mattei/hw-monitor-alignment.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kristof-mattei/hw-monitor-alignment/issues"
+  },
+  "homepage": "https://github.com/kristof-mattei/hw-monitor-alignment#readme",
+  "devDependencies": {
+    "@actions/tool-cache": "2.0.2",
+    "prettier": "3.4.2"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  }
 }
