@@ -112,6 +112,8 @@ jobs:
 
           cargo --version
 
+          sudo apt update
+
           sudo apt install --yes qt6-declarative-dev
 
       - name: Get binstall
@@ -193,6 +195,8 @@ jobs:
 
           cargo --version
 
+          sudo apt update
+
           sudo apt install --yes qt6-declarative-dev
 
       - name: Build
@@ -241,6 +245,8 @@ jobs:
 
           cargo --version
 
+          sudo apt update
+
           sudo apt install --yes qt6-declarative-dev
 
       - name: Check formatting
@@ -283,6 +289,8 @@ jobs:
           rustup update
 
           cargo --version
+
+          sudo apt update
 
           sudo apt install --yes qt6-declarative-dev
 
@@ -411,6 +419,8 @@ jobs:
           rustup update
 
           cargo --version
+
+          sudo apt update
 
           sudo apt install --yes qt6-declarative-dev
 
