@@ -168,22 +168,23 @@ dependencies = [
 
 [[package]]
 name = "cxx-qt"
-version = "0.7.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "80f050c8baa5e049664109c564061034c9aa2adfaf75545111e807edff5c55a7"
+checksum = "208ad6c4feac92f221fde00796f317b049ba1892b97be0d60ca177d0d3469fc5"
 dependencies = [
  "cxx",
  "cxx-qt-build",
  "cxx-qt-macro",
  "qt-build-utils",
  "static_assertions",
+ "thiserror",
 ]
 
 [[package]]
 name = "cxx-qt-build"
-version = "0.7.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6390fa09cf1552c3e1066fe6e9a1fd8a450bdc310736b6d2dd4648d3272a37a6"
+checksum = "15f80e109aa68795486c70c302f6c2d921f00028b3b62038a4601efb5c585c1c"
 dependencies = [
  "cc",
  "codespan-reporting",
@@ -199,9 +200,9 @@ dependencies = [
 
 [[package]]
 name = "cxx-qt-gen"
-version = "0.7.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ea8c8af7ca92109c49ac9c832c16e8ab9bb26db2343abbd7bf33ecabe23320f4"
+checksum = "dc17d95ca9cc60c2f91f804a4e0ba6a3e1b8ed338c207a1bd8d176133e2fd05d"
 dependencies = [
  "clang-format",
  "convert_case",
@@ -213,9 +214,9 @@ dependencies = [
 
 [[package]]
 name = "cxx-qt-lib"
-version = "0.7.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "baf6eebd6c5d3b84d7e456675e45e588e479d58dd65d1b7a70109536b091d9e2"
+checksum = "f116c5d982bbf3be707acf97f566802c30454d52ca319c745ed39a04834e8bc6"
 dependencies = [
  "cxx",
  "cxx-qt",
@@ -225,9 +226,9 @@ dependencies = [
 
 [[package]]
 name = "cxx-qt-macro"
-version = "0.7.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "380e8dfd965061880eb07810c91941e97a8fd611863ea41c2de59f2dae528d26"
+checksum = "58a4fe02c0604eda28c605792f5ba0d0251b4947f8f0fc43e55b61c06b2b8ec6"
 dependencies = [
  "cxx-qt-gen",
  "proc-macro2",
@@ -430,9 +431,9 @@ dependencies = [
 
 [[package]]
 name = "qt-build-utils"
-version = "0.7.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3f9bd6788f49a3c8c4389cb8ac1e99b6c7451e7ebbd50760bdd92e45c2e41f58"
+checksum = "efb239fdd8c036fabb95364320041ef68197cd4ab971bb3b4ca3ea0b7b93d12c"
 dependencies = [
  "cc",
  "thiserror",
