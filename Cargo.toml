@@ -37,7 +37,7 @@ non_ascii_idents = { level = "deny", priority = 127 }
 
 [dependencies]
 color-eyre = { git = "https://github.com/eyre-rs/eyre", rev = "c4ee249f7c51dc6452e8704ae8d117d90d6eeebc" }
-cxx = "1.0.157"
+cxx = "1.0.158"
 cxx-qt = "0.7.1"
 cxx-qt-lib = { version = "0.7.1", features = ["qt_full"] }
 
