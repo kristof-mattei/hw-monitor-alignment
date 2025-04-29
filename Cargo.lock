@@ -231,9 +231,9 @@ dependencies = [
 
 [[package]]
 name = "cxx-qt-lib"
-version = "0.7.1"
+version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f116c5d982bbf3be707acf97f566802c30454d52ca319c745ed39a04834e8bc6"
+checksum = "42e4ea0cf8e4b89b81ca92f3e6ad9d4b73f493e7616d46a64a73153731dc14bc"
 dependencies = [
  "cxx",
  "cxx-qt",
