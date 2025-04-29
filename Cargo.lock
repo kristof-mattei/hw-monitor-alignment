@@ -199,9 +199,9 @@ dependencies = [
 
 [[package]]
 name = "cxx-qt-build"
-version = "0.7.1"
+version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "15f80e109aa68795486c70c302f6c2d921f00028b3b62038a4601efb5c585c1c"
+checksum = "4cee79cc965fc86eece3c84896d30b075a49b98dce784c7f874a8b6827536239"
 dependencies = [
  "cc",
  "codespan-reporting 0.11.1",
@@ -217,9 +217,9 @@ dependencies = [
 
 [[package]]
 name = "cxx-qt-gen"
-version = "0.7.1"
+version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dc17d95ca9cc60c2f91f804a4e0ba6a3e1b8ed338c207a1bd8d176133e2fd05d"
+checksum = "fa5e6dd2c802128a9cd3c6f295b4aa3239d5bc67fa366b2e08fb895baea85b1f"
 dependencies = [
  "clang-format",
  "convert_case",
@@ -461,9 +461,9 @@ dependencies = [
 
 [[package]]
 name = "qt-build-utils"
-version = "0.7.1"
+version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "efb239fdd8c036fabb95364320041ef68197cd4ab971bb3b4ca3ea0b7b93d12c"
+checksum = "ce2f932be2cc04afebe74dc6f434377dd53ea63f562ad14c99176f01267a8917"
 dependencies = [
  "cc",
  "thiserror",
