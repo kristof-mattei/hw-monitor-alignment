@@ -40,7 +40,7 @@ let_underscore_drop = { level = "deny", priority = 127 }
 non_ascii_idents = { level = "deny", priority = 127 }
 
 [dependencies]
-color-eyre = "0.6.4"
+color-eyre = "0.6.5"
 cxx = "1.0.158"
 cxx-qt = "0.7.2"
 cxx-qt-lib = { version = "0.7.2", features = ["qt_full"] }
