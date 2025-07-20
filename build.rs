@@ -1,6 +1,6 @@
 use std::env;
 use std::fs::OpenOptions;
-use std::io::Write;
+use std::io::Write as _;
 use std::path::PathBuf;
 
 use cxx_qt_build::{CxxQtBuilder, QmlModule};

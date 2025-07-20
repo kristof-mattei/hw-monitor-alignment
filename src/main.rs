@@ -1,6 +1,7 @@
 use cxx_qt_lib::{QGuiApplication, QQmlApplicationEngine, QUrl};
 use hw_monitor_alignment::init_resources;
 
+#[expect(clippy::todo, reason = "Seed code")]
 fn main() -> Result<(), color_eyre::Report> {
     color_eyre::install()?;
 
