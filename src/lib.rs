@@ -1,4 +1,4 @@
-#[expect(clippy::unnecessary_box_returns)]
+#[expect(clippy::unnecessary_box_returns, reason = "3rd party code")]
 pub mod cxxqt_object;
 
 pub fn init_resources() {
@@ -7,6 +7,7 @@ pub fn init_resources() {
         fn init_qt_resources();
     }
 
+    // SAFETY: lib call
     unsafe {
         init_qt_resources();
     }
