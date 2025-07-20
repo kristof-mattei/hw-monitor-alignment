@@ -37,12 +37,9 @@ fn main() -> Result<(), color_eyre::Report> {
 
 #[cfg(test)]
 mod tests {
-    #[expect(unused)]
+    #[expect(
+        unused,
+        reason = "To ensure QT stuff gets included when compiling for tests"
+    )]
     use hw_monitor_alignment::init_resources;
-
-    #[test]
-    fn another_test() {
-        let one_less_kid = "👨‍👩‍👦‍👦".chars().take(5).collect::<String>();
-        assert_eq!(one_less_kid, "👨‍👩‍👦");
-    }
 }
