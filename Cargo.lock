@@ -19,9 +19,9 @@ checksum = "320119579fcad9c21884f5c4861d16174d0e06250625266f50fe6898340abefa"
 
 [[package]]
 name = "anstyle"
-version = "1.0.11"
+version = "1.0.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "862ed96ca487e809f1c8e5a8447f6ee2cf102f846893800b20cebdf541fc6bbd"
+checksum = "5192cca8006f1fd4f7237516f40fa183bb07f8fbdfedaa0036de5ea9b0b45e78"
 
 [[package]]
 name = "backtrace"
@@ -193,9 +193,9 @@ dependencies = [
 
 [[package]]
 name = "cxx-qt"
-version = "0.7.2"
+version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1013b28f54b0872a7d1a08e46325ab0603de7aab30bbf41c08bfafb8bb4a2656"
+checksum = "fb4ce9106b3ee7ef85f77d5f69ec30ec3037ea1edacd3e29a61b26ff47ecc637"
 dependencies = [
  "cxx",
  "cxx-qt-build",
@@ -207,9 +207,9 @@ dependencies = [
 
 [[package]]
 name = "cxx-qt-build"
-version = "0.7.2"
+version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4cee79cc965fc86eece3c84896d30b075a49b98dce784c7f874a8b6827536239"
+checksum = "23a7884708e645dc34a2c475bd8c505a2ffeb7c9cb0843f5c580c002c939ea30"
 dependencies = [
  "cc",
  "codespan-reporting 0.11.1",
@@ -225,9 +225,9 @@ dependencies = [
 
 [[package]]
 name = "cxx-qt-gen"
-version = "0.7.2"
+version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fa5e6dd2c802128a9cd3c6f295b4aa3239d5bc67fa366b2e08fb895baea85b1f"
+checksum = "ea6b431dc58e4a9b7a55b675be0941331cc2cab0a494e4742ebf7bb393c3fc39"
 dependencies = [
  "clang-format",
  "convert_case",
@@ -239,9 +239,9 @@ dependencies = [
 
 [[package]]
 name = "cxx-qt-lib"
-version = "0.7.2"
+version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "42e4ea0cf8e4b89b81ca92f3e6ad9d4b73f493e7616d46a64a73153731dc14bc"
+checksum = "527b46c28be6bf3dd02f1567706641fe247a8798defab8268c84602955741217"
 dependencies = [
  "cxx",
  "cxx-qt",
@@ -251,9 +251,9 @@ dependencies = [
 
 [[package]]
 name = "cxx-qt-macro"
-version = "0.7.2"
+version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "48c4c602fd8a942cb1986df9255e3fd8613cddb6e0e383119f2eb5450dc0ab12"
+checksum = "971d8811fd1c8dd06c17284edcfc8e9663dac30d7e3d52159405f836a81923f1"
 dependencies = [
  "cxx-qt-gen",
  "proc-macro2",
@@ -478,9 +478,9 @@ checksum = "42f5e15c9953c5e4ccceeb2e7382a716482c34515315f7b03532b8b4e8393d2d"
 
 [[package]]
 name = "owo-colors"
-version = "4.2.2"
+version = "4.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "48dd4f4a2c8405440fd0462561f0e5806bd0f77e86f51c761481bdd4018b545e"
+checksum = "9c6901729fa79e91a0913333229e9ca5dc725089d1c363b2f4b4760709dc4a52"
 
 [[package]]
 name = "pin-project-lite"
@@ -499,9 +499,9 @@ dependencies = [
 
 [[package]]
 name = "qt-build-utils"
-version = "0.7.2"
+version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ce2f932be2cc04afebe74dc6f434377dd53ea63f562ad14c99176f01267a8917"
+checksum = "63c7e24653d0b3084180066306b26e532b152470b13a050c2d2960284d4b9f53"
 dependencies = [
  "cc",
  "thiserror",
@@ -510,9 +510,9 @@ dependencies = [
 
 [[package]]
 name = "quote"
-version = "1.0.40"
+version = "1.0.41"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1885c039570dc00dcb4ff087a89e185fd56bae234ddc7f056a945bf36467248d"
+checksum = "ce25767e7b499d1b604768e7cde645d14cc8584231ea6b295e9c9eb22c02e1d1"
 dependencies = [
  "proc-macro2",
 ]
