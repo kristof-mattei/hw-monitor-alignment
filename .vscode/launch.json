@@ -5,22 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "lldb",
-            "request": "launch",
             "name": "Debug executable 'hw-monitor-alignment'",
+            "type": "lldb",
+            "request": "launch",
             "cargo": {
-                "args": [
-                    "build",
-                    "--bin=hw-monitor-alignment",
-                    "--package=hw-monitor-alignment"
-                ],
-                "filter": {
-                    "name": "hw-monitor-alignment",
-                    "kind": "bin"
-                }
+                "args": ["run", "--bin=hw-monitor-alignment"]
             },
             "args": [],
-            "cwd": "${workspaceFolder}",
             "env": {
                 "RUST_BACKTRACE": "1",
                 "RUST_LOG": "DEBUG,hw_monitor_alignment=TRACE"
@@ -29,23 +20,12 @@
             "terminal": "integrated"
         },
         {
-            "type": "lldb",
-            "request": "launch",
             "name": "Debug unit tests in executable 'hw-monitor-alignment'",
+            "type": "lldb",
+            "request": "launch",
             "cargo": {
-                "args": [
-                    "test",
-                    "--no-run",
-                    "--bin=hw-monitor-alignment",
-                    "--package=hw-monitor-alignment"
-                ],
-                "filter": {
-                    "name": "hw-monitor-alignment",
-                    "kind": "bin"
-                }
+                "args": ["test", "--bin=hw-monitor-alignment"]
             },
-            "args": [],
-            "cwd": "${workspaceFolder}",
             "env": {
                 "RUST_BACKTRACE": "1",
                 "RUST_LOG": "DEBUG,hw_monitor_alignment=TRACE"
@@ -54,23 +34,12 @@
             "terminal": "integrated"
         },
         {
+            "name": "Debug integration test 'integration_tests'",
             "type": "lldb",
             "request": "launch",
-            "name": "Debug integration test 'integration_tests'",
             "cargo": {
-                "args": [
-                    "test",
-                    "--no-run",
-                    "--test=integration_tests",
-                    "--package=hw-monitor-alignment"
-                ],
-                "filter": {
-                    "name": "integration_tests",
-                    "kind": "test"
-                }
+                "args": ["test", "--test=integration_tests"]
             },
-            "args": [],
-            "cwd": "${workspaceFolder}",
             "env": {
                 "RUST_BACKTRACE": "1",
                 "RUST_LOG": "DEBUG,hw_monitor_alignment=TRACE"
