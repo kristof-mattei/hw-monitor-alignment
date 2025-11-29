@@ -1,45 +1,37 @@
-use cxx_qt_lib::{QGuiApplication, QQmlApplicationEngine, QUrl};
-use hw_monitor_alignment::init_resources;
+use slint::ComponentHandle as _;
 
-fn main() -> Result<(), color_eyre::Report> {
-    color_eyre::install()?;
+use crate::ui::MainWindow;
 
-    // IF YOU REMOVE THIS LINE IT'LL BREAK
-    init_resources();
-
-    // Create the application and engine
-    let mut app = QGuiApplication::new();
-    let mut engine = QQmlApplicationEngine::new();
-
-    // Load the QML path into the engine
-    if let Some(engine) = engine.as_mut() {
-        engine.load(&QUrl::from("qrc:/qt/qml/hw_monitor_alignment/qml/main.qml"));
-    }
-
-    if let Some(engine) = engine.as_mut() {
-        // doesn't seem to work?
-        // Listen to a signal from the QML Engine
-        engine
-            .as_qqmlengine()
-            .on_quit(|_| {
-                println!("QML Quit!");
-            })
-            .release();
-    }
-
-    // Start the app
-    if let Some(app) = app.as_mut() {
-        app.exec();
-    }
-
-    Ok(())
+pub mod ui {
+    #![allow(
+        clippy::all,
+        clippy::pedantic,
+        clippy::nursery,
+        clippy::restriction,
+        let_underscore_drop,
+        reason = "slint has lots of rust violations"
+    )]
+    slint::include_modules!();
 }
 
-#[cfg(test)]
-mod tests {
-    #[expect(
-        unused,
-        reason = "To ensure QT stuff gets included when compiling for tests"
-    )]
-    use hw_monitor_alignment::init_resources;
+fn main() {
+    let state = init();
+
+    let main_window = state.main_window.clone_strong();
+
+    main_window.run().unwrap();
+}
+
+fn init() -> State {
+    let main_window = MainWindow::new().unwrap();
+
+    State {
+        main_window,
+        // todo_model,
+    }
+}
+
+pub struct State {
+    pub main_window: MainWindow,
+    // pub todo_model: Rc<slint::VecModel<TodoItem>>,
 }
