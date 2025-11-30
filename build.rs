@@ -1,69 +1,48 @@
 use std::env;
-use std::fs::OpenOptions;
-use std::io::Write as _;
-use std::path::PathBuf;
-
-use cxx_qt_build::{CxxQtBuilder, QmlModule};
+use std::ffi::OsStr;
 
 fn main() {
-    let modules = [QmlModule {
-        uri: "hw_monitor_alignment",
-        version_major: 1,
-        version_minor: 0,
-        rust_files: &["src/cxxqt_object.rs"],
-        qml_files: &["qml/main.qml"],
-        ..Default::default()
-    }];
+    slint_build::compile("src/ui/todo.slint").unwrap();
 
-    let mut builder = CxxQtBuilder::new().cc_builder(|cc| {
-        let start = r#"#include <QtPlugin>
+    export_var(
+        "COMPILE_TIME_HOST",
+        &env::var("HOST").expect("HOST is set for build scripts"),
+    );
+    export_var(
+        "COMPILE_TIME_TARGET",
+        &env::var("TARGET").expect("TARGET is set for build scripts"),
+    );
+    export_var(
+        "COMPILE_TIME_TARGET_CPU",
+        &extract_target_cpu_from_rustflags(
+            &env::var_os("CARGO_ENCODED_RUSTFLAGS").unwrap_or_default(),
+        )
+        .unwrap_or_default(),
+    );
 
-void _init_qt_resources() {
-    std::fprintf(stderr, "Initializing plugins...\n");
-            "#;
-
-        let end = r#"
-    std::fprintf(stderr, "Done initializing plugins...\n");
+    println!("cargo:rerun-if-changed-env=HOST");
+    println!("cargo:rerun-if-changed-env=TARGET");
+    println!("cargo:rerun-if-changed-env=CARGO_ENCODED_RUSTFLAGS");
 }
 
-extern "C" {
-    void init_qt_resources() {
-        _init_qt_resources();
-    }
-}
-            "#;
+fn extract_target_cpu_from_rustflags(rustflags: &OsStr) -> Option<String> {
+    const ASCII_SEPARATOR: char = '\x1f';
 
-        let mut cpp_directory = PathBuf::from(env::var("OUT_DIR").unwrap());
-        cpp_directory.push("cxx-qt-gen/src");
+    let rustflags = rustflags.to_string_lossy();
 
-        std::fs::create_dir_all(&cpp_directory).expect("Couldn't create dir");
+    let mut cpu = None;
 
-        let cpp_file = cpp_directory.join("init_hack.cpp");
+    for flag in rustflags.split(ASCII_SEPARATOR) {
+        let stripped_c = flag.strip_prefix("-C").unwrap_or(flag);
 
-        let mut file = OpenOptions::new()
-            .read(true)
-            .write(true)
-            .truncate(true)
-            .create(true)
-            .open(&cpp_file)
-            .expect("Couldn't create file");
-
-        writeln!(file, "{}", start).expect("Failed to write start");
-
-        for m in &modules {
-            writeln!(file, "    Q_IMPORT_PLUGIN({}_plugin)", m.uri).expect("Failed to write piece");
+        if let Some(target_cpu) = stripped_c.strip_prefix("target-cpu=") {
+            cpu = Some(target_cpu);
         }
-
-        writeln!(file, "{}", end).expect("Failed to write end");
-
-        cc.file(cpp_file);
-    });
-
-    for m in modules {
-        builder = builder.qml_module(m);
     }
-    // if mac
-    // .qt_module("Network")
 
-    builder.build();
+    cpu.map(str::to_owned)
+}
+
+fn export_var(name: &str, value: &str) {
+    println!("cargo:rustc-env={}={}", name, value);
 }

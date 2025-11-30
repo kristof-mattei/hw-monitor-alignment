@@ -12,16 +12,10 @@ repository = "https://github.com/kristof-mattei/hw-monitor-alignment"
 include = ["src/**", "/LICENSE", "/LICENSE-*"]
 
 [dependencies]
-color-eyre = "0.6.5"
-cxx = "1.0.190"
-cxx-qt = "0.7.3"
-cxx-qt-lib = { version = "0.7.3", features = ["qt_full"] }
+slint = { version = "1.14.1", features = ["serde"] }
 
 [build-dependencies]
-cxx-qt-build = { version = "0.7.3", features = ["link_qt_object_files"] }
-
-[package.metadata.cargo-machete]
-ignored = ["cxx"]
+slint-build = "1.14.1"
 
 [lints.clippy]
 # don't stop from compiling / running
