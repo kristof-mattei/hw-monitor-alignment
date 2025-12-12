@@ -491,7 +491,6 @@ jobs:
 
       - *get_binstall
 
-
       - name: Install qt6-declarative-dev
         shell: bash
         run: |
