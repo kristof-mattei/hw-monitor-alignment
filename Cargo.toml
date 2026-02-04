@@ -12,7 +12,7 @@ repository = "https://github.com/kristof-mattei/hw-monitor-alignment"
 include = ["src/**", "/LICENSE", "/LICENSE-*"]
 
 [dependencies]
-slint = { version = "1.14.1", features = ["serde"] }
+slint = { version = "1.15.0", features = ["serde"] }
 
 [build-dependencies]
 slint-build = "1.14.1"
