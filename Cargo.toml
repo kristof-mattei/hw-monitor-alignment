@@ -15,7 +15,7 @@ include = ["src/**", "/LICENSE", "/LICENSE-*"]
 slint = { version = "1.15.0", features = ["serde"] }
 
 [build-dependencies]
-slint-build = "1.14.1"
+slint-build = "1.15.0"
 
 [package.metadata.spellcheck]
 config = "spellcheck.toml"

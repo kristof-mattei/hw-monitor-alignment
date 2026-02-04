@@ -184,12 +184,13 @@ jobs:
 
           cargo --version
 
-      - name: Install qt6-declarative-dev
+      - &set_up_qt
+        name: Install general OS dependencies
         shell: bash
         run: |
-          sudo apt update
+          sudo apt-get update
 
-          sudo apt install --yes qt6-declarative-dev
+          sudo apt-get install --yes libfontconfig1-dev qt6-declarative-dev
 
       - name: Build
         shell: bash
@@ -245,12 +246,7 @@ jobs:
 
       - *set_up_toolchain
 
-      - name: Install qt6-declarative-dev
-        shell: bash
-        run: |
-          sudo apt update
-
-          sudo apt install --yes qt6-declarative-dev
+      - *set_up_qt
 
       - name: Install llvm-tools
         shell: bash
@@ -358,12 +354,7 @@ jobs:
 
       - *set_up_toolchain
 
-      - name: Install qt6-declarative-dev
-        shell: bash
-        run: |
-          sudo apt update
-
-          sudo apt install --yes qt6-declarative-dev
+      - *set_up_qt
 
       - name: Run Clippy for GitHub Actions report
         uses: actions-rs-plus/clippy-check@a25517dc6178320cb29e6e5e4d4db30348df6f3f # v2.4.2
@@ -449,12 +440,7 @@ jobs:
 
       - *set_up_toolchain
 
-      - name: Install qt6-declarative-dev
-        shell: bash
-        run: |
-          sudo apt update
-
-          sudo apt install --yes qt6-declarative-dev
+      - *set_up_qt
 
       - name: Install cargo-edit to do set-version
         uses: taiki-e/install-action@3f67faa728964808f52294a9cd15561b15550b28 # v2.67.19
