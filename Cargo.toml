@@ -1,5 +1,8 @@
-[package]
-name = "hw-monitor-alignment"
+[workspace]
+resolver = "3"
+members = ["crates/hw-monitor-alignment", "crates/shared"]
+
+[workspace.package]
 version = "0.0.0-development"
 edition = "2024"
 rust-version = "1.93.0"
@@ -9,18 +12,14 @@ license = "MIT"
 categories = ["starter", "seed"]
 keywords = ["integrity", "seed", "starter", "docker", "release"]
 repository = "https://github.com/kristof-mattei/hw-monitor-alignment"
-include = ["src/**", "/LICENSE", "/LICENSE-*"]
+include = ["crates/**", "/LICENSE", "/LICENSE-*"]
 
-[dependencies]
-slint = { version = "1.15.0", features = ["serde"] }
+[workspace.dependencies]
 
-[build-dependencies]
-slint-build = "1.15.0"
-
-[package.metadata.spellcheck]
+[workspace.metadata.spellcheck]
 config = "spellcheck.toml"
 
-[lints.clippy]
+[workspace.lints.clippy]
 # don't stop from compiling / running
 all = "warn"
 cargo = "warn"
@@ -244,6 +243,6 @@ redundant_else = { level = "allow", priority = 127 }
 # so we don't inline anything
 uninlined_format_args = { level = "allow", priority = 127 }
 
-[lints.rust]
+[workspace.lints.rust]
 let_underscore_drop = { level = "deny", priority = 127 }
 non_ascii_idents = { level = "deny", priority = 127 }
