@@ -3,8 +3,10 @@ name: Graduate Release
 
 on:
   pull_request:
-    types: [closed]
-    branches: [main]
+    types:
+      - closed
+    branches:
+      - main
 
 permissions:
   contents: write # to create tags
@@ -58,7 +60,7 @@ jobs:
           git push origin "${TAG}"
 
       - name: Install git-cliff to generate changelog
-        uses: taiki-e/install-action@68675c5a5f1a6950c3975d33f3ae0ef155e5bf3d # v2.68.15
+        uses: taiki-e/install-action@5ab5d1729c22acd8f798b267eadcfe5e5be6f5c2 # v2.68.27
         with:
           tool: git-cliff
 
@@ -106,6 +108,6 @@ jobs:
             --state open \
             --json number,headRefName \
             --jq '.[] | select(.headRefName | startswith("release/v")) | .number' \
-          | while read pr_number; do
+          | while IFS= read -r pr_number; do
             gh pr close "$pr_number" --delete-branch
           done
