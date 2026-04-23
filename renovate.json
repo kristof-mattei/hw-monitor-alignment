@@ -5,5 +5,12 @@
         "github>kristof-mattei/renovate-config//github-actions/nonSemver",
         "github>kristof-mattei/renovate-config//rust/updateRustVersionInCargoToml",
         "github>kristof-mattei/renovate-config//rust/updateChannelInRustToolchainToml"
+    ],
+    "packageRules": [
+        {
+            "matchDatasources": ["crate"],
+            "matchPackageNames": ["slint", "slint-build"],
+            "groupName": "slint"
+        }
     ]
 }
