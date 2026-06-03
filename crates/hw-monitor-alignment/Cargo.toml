@@ -16,11 +16,20 @@ build = "src/build.rs"
 default = []
 
 [dependencies]
-color-eyre = "0.6.5"
-slint = { version = "1.16.1", features = ["serde"] }
+hashbrown = "0.17.1"
+windows-reactor = { git = "https://github.com/microsoft/windows-rs", branch = "master" }
+windows-sys = { git = "https://github.com/microsoft/windows-rs", branch = "master", features = [
+    "Win32_Foundation",
+    "Win32_Graphics_Gdi",
+    "Win32_Devices_Display",
+    "Win32_UI_Controls",
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_UI_Input_KeyboardAndMouse",
+    "Win32_System_LibraryLoader",
+] }
 
 [build-dependencies]
-slint-build = "1.16.1"
+windows-reactor-setup = { git = "https://github.com/microsoft/windows-rs", branch = "master" }
 
 [dev-dependencies]
 pretty_assertions = "=1.4.1"

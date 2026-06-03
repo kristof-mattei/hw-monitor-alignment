@@ -1,0 +1,118 @@
+#![allow(
+    clippy::as_conversions,
+    reason = "Win32 FFI requires explicit integer casts"
+)]
+
+use windows_sys::Win32::Graphics::Gdi::{
+    DEVMODEW, DISPLAY_DEVICE_ATTACHED_TO_DESKTOP, DISPLAY_DEVICE_MIRRORING_DRIVER,
+    DISPLAY_DEVICE_PRIMARY_DEVICE, DISPLAY_DEVICEW, ENUM_REGISTRY_SETTINGS, EnumDisplayDevicesW,
+    EnumDisplaySettingsW,
+};
+use windows_sys::Win32::UI::WindowsAndMessaging::EDD_GET_DEVICE_INTERFACE_NAME;
+
+use crate::monitor::{Monitor, Orientation};
+use crate::win32::friendly;
+
+fn wstr_to_string(buf: &[u16]) -> String {
+    String::from_utf16_lossy(buf)
+}
+
+pub fn discover_monitors() -> Vec<Monitor> {
+    // Friendly names come from a separate CCD-API pass, keyed by device path.
+    let friendly_names = friendly::discover_friendly_names();
+
+    let mut monitors = Vec::new();
+    // display adaptor id
+    let mut i_dev: u32 = 0;
+
+    loop {
+        let mut dd = DISPLAY_DEVICEW {
+            cb: u32::try_from(size_of::<DISPLAY_DEVICEW>()).unwrap(),
+            ..DISPLAY_DEVICEW::default()
+        };
+
+        // SAFETY: dd is initialised above and lives for the call duration.
+        let found_display_adaptor =
+            unsafe { EnumDisplayDevicesW(std::ptr::null(), i_dev, &raw mut dd, 0) };
+
+        if found_display_adaptor == 0 {
+            break;
+        }
+
+        // monitor id, per display adaptor
+        let mut device_monitor: u32 = 0;
+
+        loop {
+            let mut ddm = DISPLAY_DEVICEW {
+                cb: u32::try_from(size_of::<DISPLAY_DEVICEW>()).unwrap(),
+                ..DISPLAY_DEVICEW::default()
+            };
+
+            // SAFETY: API call, `ddm` is correctly initialized, `dd.DeviceName` comes from another API call
+            let found_monitor = unsafe {
+                EnumDisplayDevicesW(
+                    dd.DeviceName.as_ptr(),
+                    device_monitor,
+                    &raw mut ddm,
+                    EDD_GET_DEVICE_INTERFACE_NAME,
+                )
+            };
+
+            if found_monitor == 0 {
+                break;
+            }
+
+            let is_attached = ddm.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP != 0;
+            let is_mirroring = ddm.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER != 0;
+
+            if is_attached && !is_mirroring {
+                let mut devmode = DEVMODEW {
+                    dmSize: u16::try_from(size_of::<DEVMODEW>()).unwrap(),
+                    ..DEVMODEW::default()
+                };
+
+                // SAFETY: `dd.DeviceName` comes from another API call, `devmode` is initialized.
+                let ok = unsafe {
+                    EnumDisplaySettingsW(
+                        dd.DeviceName.as_ptr(),
+                        ENUM_REGISTRY_SETTINGS,
+                        &raw mut devmode,
+                    )
+                };
+
+                if ok != 0 {
+                    // SAFETY: reading nested anonymous union.
+                    let display = unsafe { devmode.Anonymous1.Anonymous2 };
+                    let pos = display.dmPosition;
+
+                    let device_id = wstr_to_string(&ddm.DeviceID);
+
+                    // fetch friendly name
+                    let friendly_monitor_name = friendly_names
+                        .get(&device_id)
+                        .map_or("", |s| &**s)
+                        .to_owned();
+
+                    monitors.push(Monitor {
+                        device_name: wstr_to_string(&dd.DeviceName).into(),
+                        monitor_name: wstr_to_string(&ddm.DeviceString).into(),
+                        friendly_monitor_name: friendly_monitor_name.into(),
+                        display_adapter: wstr_to_string(&dd.DeviceString).into(),
+                        width: devmode.dmPelsWidth,
+                        height: devmode.dmPelsHeight,
+                        x: pos.x,
+                        y: pos.y,
+                        orientation: Orientation::from_dmdo(display.dmDisplayOrientation),
+                        primary: dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE != 0,
+                    });
+                }
+            }
+
+            device_monitor += 1;
+        }
+
+        i_dev += 1;
+    }
+
+    monitors
+}

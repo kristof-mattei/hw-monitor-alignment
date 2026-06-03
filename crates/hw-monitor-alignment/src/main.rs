@@ -1,62 +1,32 @@
-use color_eyre::config::HookBuilder;
-use color_eyre::eyre;
-use slint::ComponentHandle as _;
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+#![expect(clippy::cast_possible_wrap, reason = "WIP")]
+#![expect(clippy::disallowed_names, reason = "WIP")]
+#![expect(clippy::struct_field_names, reason = "WIP")]
 
-use crate::ui::MainWindow;
-mod build_env;
-use build_env::get_build_env;
+use std::sync::Arc;
 
-pub mod ui {
-    #![allow(
-        clippy::all,
-        clippy::pedantic,
-        clippy::nursery,
-        clippy::restriction,
-        let_underscore_drop,
-        reason = "slint has lots of rust violations"
-    )]
-    slint::include_modules!();
-}
+use windows_reactor::{App, InnerConstraints, Result, bootstrap};
 
-fn print_header() {
-    const NAME: &str = env!("CARGO_PKG_NAME");
-    const VERSION: &str = env!("CARGO_PKG_VERSION");
+mod monitor;
+mod ui;
+mod win32;
 
-    let build_env = get_build_env();
+const WINDOW_TITLE: &str = "HwMonitorAlignment";
 
-    println!(
-        "{} v{} - built for {} ({})",
-        NAME,
-        VERSION,
-        build_env.get_target(),
-        build_env.get_target_cpu().unwrap_or("base cpu variant"),
-    );
-}
+fn main() -> Result<()> {
+    // ensure we have the WinUI3 package. We HAVE to keep this until the application ends.
+    let _bootstrap_handle = bootstrap::initialize()?;
 
-fn main() -> Result<(), eyre::Report> {
-    HookBuilder::default()
-        .capture_span_trace_by_default(true)
-        .install()?;
+    let monitors: Arc<[monitor::Monitor]> = win32::discover::discover_monitors().into();
 
-    print_header();
-
-    let state = init();
-
-    let main_window = state.main_window.clone_strong();
-
-    main_window.run().map_err(Into::into)
-}
-
-fn init() -> State {
-    let main_window = MainWindow::new().unwrap();
-
-    State {
-        main_window,
-        // todo_model,
-    }
-}
-
-pub struct State {
-    pub main_window: MainWindow,
-    // pub todo_model: Rc<slint::VecModel<TodoItem>>,
+    App::new()
+        .title(WINDOW_TITLE)
+        .inner_size(570.0, 900.0)
+        .inner_constraints(InnerConstraints {
+            min_width: Some(570.0),
+            max_width: Some(570.0),
+            min_height: Some(900.0),
+            max_height: Some(900.0),
+        })
+        .render(move |cx| ui::main_window::render(cx, &monitors).into())
 }
