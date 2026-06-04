@@ -9,8 +9,8 @@ rust-version = "1.96.0"
 authors = ["Kristof Mattei"]
 description = "HwMonitorAlignment"
 license = "MIT"
-categories = []
-keywords = []
+categories = ["config", "gui"]
+keywords = ["utility", "windows", "adjustment"]
 repository = "https://github.com/kristof-mattei/hw-monitor-alignment"
 include = ["crates/**", "/LICENSE", "/LICENSE-*"]
 
