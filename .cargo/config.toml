@@ -1,2 +1,6 @@
 [target.'cfg(target_os = "linux")']
 rustflags = ["-C", "link-arg=-fuse-ld=mold"]
+
+[net]
+# `windows-rs` is slow to clone with `libgit2`
+git-fetch-with-cli = true
