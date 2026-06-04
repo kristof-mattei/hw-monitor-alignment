@@ -205,15 +205,15 @@ jobs:
       - name: Run grcov
         shell: pwsh
         run: |
-          grcov $(Get-ChildItem -Recurse -Filter '*.profraw' -Path . | % { $_.FullName }) `
+          grcov $(Get-ChildItem -Recurse -Filter 'profile-*.profraw' -Path . | ForEach-Object { $_.FullName }) `
             --binary-path ./target/debug/ `
             --branch `
-            --excl-br-line "^\s*((debug_)?assert(_eq|_ne)?!)" `
-            --excl-br-start "mod tests \{" `
-            --excl-line "(#\\[derive\\()|(^\s*.await[;,]?$)" `
-            --excl-start "mod tests \{" `
+            --excl-br-line '^\s*((debug_)?assert(_eq|_ne)?!)' `
+            --excl-br-start 'mod tests \{' `
+            --excl-line '(#\[derive\()|(^\s*.await[;,]?$)' `
+            --excl-start 'mod tests \{' `
             --ignore-not-existing `
-            --keep-only "crates/**" `
+            --keep-only 'crates/**' `
             --llvm `
             --output-path ./reports/ `
             --output-type lcov `
@@ -234,7 +234,7 @@ jobs:
           env_vars: OS,RUST
           fail_ci_if_error: true
           flags: windows
-          files: reports/lcov.info
+          files: reports/lcov
           name: code-coverage
           plugins: ""
           report_type: "coverage"
