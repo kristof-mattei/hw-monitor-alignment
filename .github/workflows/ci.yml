@@ -59,20 +59,6 @@ jobs:
       id-token: write
       pull-requests: write
 
-  repo-has-container:
-    name: Repo has container?
-    runs-on: ubuntu-slim
-    if: ${{ !startsWith(github.head_ref, 'release/') }}
-    outputs:
-      has_container: ${{ steps.determine.outputs.has_container }}
-    steps:
-      - name: Repo has docker container?
-        shell: bash
-        id: determine
-        run: |
-          has_container="${{ vars.HAS_CONTAINER }}"
-          echo "has_container=${has_container:-false}" >> "${GITHUB_OUTPUT}"
-
   changes:
     name: Detect changes
     runs-on: ubuntu-slim
@@ -104,12 +90,10 @@ jobs:
       contents: read
     needs:
       - changes
-      - repo-has-container
     outputs:
       version: ${{ steps.version.outputs.version }}
     if: |
       github.event_name == 'pull_request' &&
-      fromJSON(needs.repo-has-container.outputs.has_container) == true &&
       (
         fromJSON(needs.changes.outputs.docker) == true ||
         fromJSON(needs.changes.outputs.rust) == true
