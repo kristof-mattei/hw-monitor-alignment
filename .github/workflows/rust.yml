@@ -30,8 +30,7 @@ jobs:
         with:
           show-progress: false
 
-      - &cache_cargo_windows
-        name: Cache cargo
+      - name: Cache cargo
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         env:
           CACHE_NAME: cargo
@@ -43,7 +42,7 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-          key: ${{ runner.os }}-${{ runner.arch }}-build-${{ env.CACHE_NAME }}-${{ hashFiles('Cargo.lock') }}-${{ github.workflow }}-${{ github.job }}
+          key: ${{ runner.os }}-${{ runner.arch }}-build-${{ env.CACHE_NAME }}-${{ hashFiles('Cargo.lock') }}-${{ github.workflow }}-warm-up-cache
           restore-keys: |
             ${{ runner.os }}-${{ runner.arch }}-build-${{ env.CACHE_NAME }}-${{ hashFiles('Cargo.lock') }}-${{ github.workflow }}-
             ${{ runner.os }}-${{ runner.arch }}-build-${{ env.CACHE_NAME }}-${{ hashFiles('Cargo.lock') }}-
@@ -72,6 +71,7 @@ jobs:
         shell: pwsh
         run: |
           cargo fetch --locked
+
   changes:
     name: Detect changes
     runs-on: ubuntu-slim
@@ -100,7 +100,22 @@ jobs:
 
       - *checkout
 
-      - *cache_cargo_windows
+      - &cache_cargo_windows
+        name: Cache cargo
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        env:
+          CACHE_NAME: cargo
+        with:
+          path: |
+            ~/.cargo/.crates.toml
+            ~/.cargo/.crates2.json
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: ${{ runner.os }}-${{ runner.arch }}-build-${{ env.CACHE_NAME }}-${{ hashFiles('Cargo.lock') }}-${{ github.workflow }}-warm-up-cache
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-build-${{ env.CACHE_NAME }}-${{ hashFiles('Cargo.lock') }}-${{ github.workflow }}-
 
       - *set_up_mold
 
@@ -289,7 +304,7 @@ jobs:
       - name: Run Clippy for GitHub Actions report
         uses: actions-rs-plus/clippy-check@23b52efac3da0e2b197a9ad2e7be0f515502aaaf # v2.5.0
         with:
-          args: --all-features --all-targets --locked --workspace --verbose
+          args: ${{ env.CARGO_FEATURES }} --all-targets --locked --workspace
 
   all-done:
     name: Rust All done
