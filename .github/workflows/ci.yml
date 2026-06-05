@@ -20,34 +20,8 @@ permissions:
 
 env:
   CARGO_TERM_COLOR: always
-  # github.repository as <account>/<repo>
-  IMAGE_NAME: ${{ github.repository }}
-  IMAGE_VARIANTS: |-
-    arm64
-    amd64
-    amd64/v2
-    amd64/v3
-  REGISTRY: ghcr.io
 
 jobs:
-  architectures:
-    name: Build matrix
-    runs-on: ubuntu-slim
-    if: ${{ !startsWith(github.head_ref, 'release/') }}
-    outputs:
-      architectures: ${{ steps.matrix.outputs.architectures }}
-    steps:
-      - name: Build matrix
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
-        id: matrix
-        with:
-          script: |
-            const architectures = process.env.IMAGE_VARIANTS.trim().split("\n").map((a) => a.trim());
-
-            const json = JSON.stringify(architectures);
-
-            core.setOutput("architectures", json);
-
   rust-build:
     name: Build Rust code
     if: ${{ !startsWith(github.head_ref, 'release/') }}
