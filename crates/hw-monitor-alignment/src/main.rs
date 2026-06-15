@@ -14,8 +14,8 @@ mod win32;
 const WINDOW_TITLE: &str = "HwMonitorAlignment";
 
 fn main() -> Result<()> {
-    // ensure we have the WinUI3 package. We HAVE to keep this until the application ends.
-    let _bootstrap_handle = bootstrap::initialize()?;
+    // ensure we have the WinUI3 package
+    bootstrap()?;
 
     let monitors: Arc<[monitor::Monitor]> = win32::discover::discover_monitors().into();
 
