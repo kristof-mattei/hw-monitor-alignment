@@ -10,6 +10,7 @@ use windows_sys::Win32::UI::WindowsAndMessaging::PostQuitMessage;
 
 use super::info_panel::info_panel;
 use crate::monitor::Monitor;
+use crate::ui::overview::overview_canvas;
 use crate::win32::window_style;
 
 pub fn render(cx: &mut RenderCx, monitors: &Arc<[Monitor]>) -> impl Into<Element> {
@@ -24,10 +25,7 @@ pub fn render(cx: &mut RenderCx, monitors: &Arc<[Monitor]>) -> impl Into<Element
         let hwnd: HWND = unsafe { GetActiveWindow() };
 
         if !hwnd.is_null() {
-            // SAFETY: `hwnd` is not null and points to valid window.
-            unsafe {
-                window_style::make_fixed(hwnd);
-            }
+            window_style::make_fixed(hwnd).expect("Failed to make window fixed");
         }
     });
 
@@ -53,13 +51,21 @@ pub fn render(cx: &mut RenderCx, monitors: &Arc<[Monitor]>) -> impl Into<Element
     .margin(Thickness::uniform(16.0));
 
     let layout = grid((
+        overview_canvas(&display_monitors)
+            .horizontal_alignment(HorizontalAlignment::Center)
+            .margin(Thickness::uniform(16.0))
+            .grid_row(0),
         info_panel(&display_monitors)
-            .horizontal_alignment(HorizontalAlignment::Stretch)
+            .horizontal_alignment(HorizontalAlignment::Left)
             .vertical_alignment(VerticalAlignment::Stretch)
             .grid_row(1),
         button_bar.grid_row(2),
     ))
-    .rows([GridLength::Auto, GridLength::STAR, GridLength::Auto])
+    .rows([
+        GridLength::Pixel(200_f64),
+        GridLength::STAR,
+        GridLength::Auto,
+    ])
     .horizontal_alignment(HorizontalAlignment::Stretch)
     .vertical_alignment(VerticalAlignment::Stretch);
 

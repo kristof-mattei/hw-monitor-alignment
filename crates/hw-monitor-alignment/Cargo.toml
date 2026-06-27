@@ -17,19 +17,29 @@ default = []
 
 [dependencies]
 hashbrown = "0.17.1"
-windows-reactor = { git = "https://github.com/microsoft/windows-rs", branch = "master" }
-windows-sys = { git = "https://github.com/microsoft/windows-rs", branch = "master", features = [
+windows = { git = "https://github.com/microsoft/windows-rs", features = [
+    "Win32_System_WinRT",
+    "Win32_UI_Shell",
+] }
+windows-core = { git = "https://github.com/microsoft/windows-rs" }
+windows-link = { git = "https://github.com/microsoft/windows-rs" }
+windows-reactor = { git = "https://github.com/microsoft/windows-rs" }
+windows-sys = { git = "https://github.com/microsoft/windows-rs", features = [
     "Win32_Foundation",
     "Win32_Graphics_Gdi",
+    "Win32_Graphics_GdiPlus",
     "Win32_Devices_Display",
     "Win32_UI_Controls",
+    "Win32_UI_HiDpi",
     "Win32_UI_WindowsAndMessaging",
     "Win32_UI_Input_KeyboardAndMouse",
     "Win32_System_LibraryLoader",
 ] }
 
 [build-dependencies]
-windows-reactor-setup = { git = "https://github.com/microsoft/windows-rs", branch = "master" }
+windows-bindgen = { git = "https://github.com/microsoft/windows-rs" }
+windows-rdl = { git = "https://github.com/microsoft/windows-rs" }
+windows-reactor-setup = { git = "https://github.com/microsoft/windows-rs" }
 
 [dev-dependencies]
 pretty_assertions = "=1.4.1"
