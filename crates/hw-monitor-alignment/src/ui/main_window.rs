@@ -1,12 +1,12 @@
 use std::sync::Arc;
 
+use windows::Win32::Foundation::HWND;
+use windows::Win32::UI::Input::KeyboardAndMouse::GetActiveWindow;
+use windows::Win32::UI::WindowsAndMessaging::PostQuitMessage;
 use windows_reactor::{
     ContentDialog, Element, ElementExt as _, GridLength, HorizontalAlignment, RenderCx, SetState,
     Thickness, VerticalAlignment, button, grid, hstack,
 };
-use windows_sys::Win32::Foundation::HWND;
-use windows_sys::Win32::UI::Input::KeyboardAndMouse::GetActiveWindow;
-use windows_sys::Win32::UI::WindowsAndMessaging::PostQuitMessage;
 
 use super::info_panel::info_panel;
 use crate::monitor::Monitor;
@@ -24,7 +24,7 @@ pub fn render(cx: &mut RenderCx, monitors: &Arc<[Monitor]>) -> impl Into<Element
         // SAFETY: failure mode is returning `NULL`
         let hwnd: HWND = unsafe { GetActiveWindow() };
 
-        if !hwnd.is_null() {
+        if !hwnd.is_invalid() {
             window_style::make_fixed(hwnd).expect("Failed to make window fixed");
         }
     });

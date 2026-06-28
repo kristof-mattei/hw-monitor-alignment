@@ -10,7 +10,7 @@ const MONITOR_BORDER_WIDTH: f64 = 20.0;
 
 /// Extract the display index from a Win32 device name.
 ///
-/// E.g. "\\.\DISPLAY1" -> "1".
+/// E.g. `"\\.\DISPLAY1" -> "1"`.
 fn index_from_device_name(device_name: &str) -> &str {
     let ummm = "?";
 

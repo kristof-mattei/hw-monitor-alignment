@@ -1,19 +1,9 @@
-#![allow(
-    clippy::as_conversions,
-    reason = "Win32 FFI requires explicit integer casts"
-)]
-#![allow(
-    clippy::multiple_unsafe_ops_per_block,
-    reason = "Win32 interop batches several unsafe calls per block"
-)]
-
-use windows::Win32::Foundation::SetLastError;
-use windows_core::WIN32_ERROR;
-use windows_sys::Win32::Foundation::HWND;
-use windows_sys::Win32::UI::WindowsAndMessaging::{
+use windows::Win32::Foundation::{HWND, SetLastError};
+use windows::Win32::UI::WindowsAndMessaging::{
     GWL_STYLE, GetWindowLongPtrW, SWP_FRAMECHANGED, SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE,
-    SWP_NOZORDER, SetWindowLongPtrW, SetWindowPos, WS_MAXIMIZEBOX, WS_THICKFRAME,
+    SWP_NOZORDER, SetWindowLongPtrW, SetWindowPos, WINDOW_STYLE, WS_MAXIMIZEBOX, WS_THICKFRAME,
 };
+use windows_core::WIN32_ERROR;
 
 /// Make `hwnd` a fixed-size dialog.
 ///
@@ -33,7 +23,11 @@ pub fn make_fixed(hwnd: HWND) -> Result<(), windows_reactor::Error> {
     }
 
     // drop `WS_THICKFRAME` and `WS_MAXIMIZEBOX` so it can't be resized and shows no resize cursor on its edges.
-    let fixed = style & !((WS_THICKFRAME | WS_MAXIMIZEBOX) as isize);
+    let fixed = WINDOW_STYLE(
+        style
+            .try_into()
+            .expect("GetWindowLongPtrW(hwnd, GWL_STYLE) returns WINDOW_STYLE"),
+    ) & !(WS_THICKFRAME | WS_MAXIMIZEBOX);
 
     // SAFETY: unset the errors so we can properly inspect return values
     unsafe {
@@ -43,7 +37,7 @@ pub fn make_fixed(hwnd: HWND) -> Result<(), windows_reactor::Error> {
     // SAFETY: `hwnd` is valid, so is the `fixed` style
     let result = unsafe {
         // set style
-        SetWindowLongPtrW(hwnd, GWL_STYLE, fixed)
+        SetWindowLongPtrW(hwnd, GWL_STYLE, fixed.0 as isize)
     };
 
     // A return of 0 is the only indicator that we need to check the error state.
@@ -52,21 +46,17 @@ pub fn make_fixed(hwnd: HWND) -> Result<(), windows_reactor::Error> {
     }
 
     // SAFETY: documented way to prevent resizing
-    let result = unsafe {
+    unsafe {
         SetWindowPos(
             hwnd,
-            std::ptr::null_mut(),
+            None,
             0,
             0,
             0,
             0,
             SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED,
         )
-    };
-
-    if result == 0 {
-        WIN32_ERROR::from_thread().ok()?;
-    }
+    }?;
 
     Ok(())
 }

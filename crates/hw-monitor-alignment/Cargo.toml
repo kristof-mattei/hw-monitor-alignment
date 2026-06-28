@@ -20,11 +20,6 @@ hashbrown = "0.17.1"
 windows = { git = "https://github.com/microsoft/windows-rs", features = [
     "Win32_System_WinRT",
     "Win32_UI_Shell",
-] }
-windows-core = { git = "https://github.com/microsoft/windows-rs" }
-windows-link = { git = "https://github.com/microsoft/windows-rs" }
-windows-reactor = { git = "https://github.com/microsoft/windows-rs" }
-windows-sys = { git = "https://github.com/microsoft/windows-rs", features = [
     "Win32_Foundation",
     "Win32_Graphics_Gdi",
     "Win32_Graphics_GdiPlus",
@@ -35,6 +30,8 @@ windows-sys = { git = "https://github.com/microsoft/windows-rs", features = [
     "Win32_UI_Input_KeyboardAndMouse",
     "Win32_System_LibraryLoader",
 ] }
+windows-core = { git = "https://github.com/microsoft/windows-rs" }
+windows-reactor = { git = "https://github.com/microsoft/windows-rs" }
 
 [build-dependencies]
 windows-bindgen = { git = "https://github.com/microsoft/windows-rs" }

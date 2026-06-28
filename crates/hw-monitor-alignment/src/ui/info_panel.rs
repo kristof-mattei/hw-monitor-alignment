@@ -5,7 +5,7 @@ use windows_reactor::{
 use crate::monitor::Monitor;
 
 /// Per-monitor info.
-pub fn info_panel(monitors: &[Monitor]) -> Border {
+pub fn info_panel(monitors: &[Monitor]) -> Element {
     // Show monitors left-to-right by virtual screen position.
     // TODO we should do this at the start
     let mut sorted: Vec<&Monitor> = monitors.iter().collect();
@@ -18,9 +18,10 @@ pub fn info_panel(monitors: &[Monitor]) -> Border {
         hstack(boxes).spacing(8.0).into(),
     )
     .margin(Thickness::xy(16.0, 0.0))
+    .into()
 }
 
-fn monitor_box(m: &Monitor) -> Border {
+fn monitor_box(m: &Monitor) -> impl Into<Element> {
     let fields = vstack([
         field("DEVICE NAME:", &m.device_name),
         field("MONITOR NAME:", &m.monitor_name),

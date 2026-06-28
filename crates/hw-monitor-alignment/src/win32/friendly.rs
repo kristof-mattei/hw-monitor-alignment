@@ -1,4 +1,4 @@
-#![allow(
+#![expect(
     clippy::as_conversions,
     reason = "Win32 FFI requires explicit integer casts"
 )]
@@ -9,13 +9,14 @@ use std::ffi::OsString;
 use std::os::windows::ffi::OsStringExt as _;
 
 use hashbrown::HashMap;
-use windows_sys::Win32::Devices::Display::{
+use windows::Win32::Devices::Display::{
     DISPLAYCONFIG_DEVICE_INFO_GET_TARGET_NAME, DISPLAYCONFIG_DEVICE_INFO_HEADER,
     DISPLAYCONFIG_MODE_INFO, DISPLAYCONFIG_PATH_INFO, DISPLAYCONFIG_TARGET_DEVICE_NAME,
     DisplayConfigGetDeviceInfo, GetDisplayConfigBufferSizes, QDC_ONLY_ACTIVE_PATHS,
     QueryDisplayConfig,
 };
-use windows_sys::Win32::Foundation::ERROR_SUCCESS;
+use windows::Win32::Foundation::ERROR_SUCCESS;
+use windows_core::WIN32_ERROR;
 
 fn trim(mut wide: &[u16]) -> &[u16] {
     while wide.last() == Some(&0) {
@@ -65,7 +66,7 @@ pub fn discover_friendly_names() -> HashMap<String, String> {
             paths.as_mut_ptr(),
             &raw mut num_mode_info_array_elements,
             modes.as_mut_ptr(),
-            std::ptr::null_mut(),
+            None,
         )
     };
 
@@ -90,7 +91,7 @@ pub fn discover_friendly_names() -> HashMap<String, String> {
         // the call fills the surrounding struct in place.
         let rc = unsafe { DisplayConfigGetDeviceInfo(&raw mut target.header) };
 
-        if rc != ERROR_SUCCESS as i32 {
+        if WIN32_ERROR(rc.cast_unsigned()).is_ok() {
             continue;
         }
 
