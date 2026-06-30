@@ -16,7 +16,7 @@ build = "src/build.rs"
 default = []
 
 [dependencies]
-hashbrown = "0.17.1"
+hashbrown = "=0.17.1"
 windows = { git = "https://github.com/microsoft/windows-rs", features = [
     "Win32_System_WinRT",
     "Win32_UI_Shell",
