@@ -85,8 +85,6 @@ impl CustomElement for SizeProbe {
                 (&None, &Some(_)) | (&Some(_), &None) => false,
             };
 
-            println!("{:?}", result);
-
             result
         } else {
             false
