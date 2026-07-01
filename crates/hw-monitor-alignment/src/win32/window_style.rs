@@ -1,7 +1,9 @@
-use windows::Win32::Foundation::{HWND, SetLastError};
+use windows::Win32::Foundation::{E_INVALIDARG, HWND, RECT, SetLastError};
+use windows::Win32::UI::HiDpi::{AdjustWindowRectExForDpi, GetDpiForSystem, GetDpiForWindow};
 use windows::Win32::UI::WindowsAndMessaging::{
-    GWL_STYLE, GetWindowLongPtrW, SWP_FRAMECHANGED, SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE,
-    SWP_NOZORDER, SetWindowLongPtrW, SetWindowPos, WINDOW_STYLE, WS_MAXIMIZEBOX, WS_THICKFRAME,
+    GWL_EXSTYLE, GWL_STYLE, GetWindowLongPtrW, GetWindowRect, SWP_FRAMECHANGED, SWP_NOACTIVATE,
+    SWP_NOMOVE, SWP_NOSIZE, SWP_NOZORDER, SetWindowLongPtrW, SetWindowPos, USER_DEFAULT_SCREEN_DPI,
+    WINDOW_EX_STYLE, WINDOW_STYLE, WS_MAXIMIZEBOX, WS_THICKFRAME,
 };
 use windows_core::WIN32_ERROR;
 
@@ -59,4 +61,118 @@ pub fn make_fixed(hwnd: HWND) -> Result<(), windows_reactor::Error> {
     }?;
 
     Ok(())
+}
+
+fn get_dpi(hwnd: HWND) -> u32 {
+    // SAFETY: the caller guarantees `hwnd` is a valid `HWND`
+    let window_dpi = unsafe { GetDpiForWindow(hwnd) };
+
+    if window_dpi != 0 {
+        return window_dpi;
+    }
+
+    // SAFETY: Win32 API call
+    let system_dpi = unsafe { GetDpiForSystem() };
+
+    if system_dpi != 0 {
+        return system_dpi;
+    }
+
+    USER_DEFAULT_SCREEN_DPI
+}
+
+/// Resize `hwnd` to the given client **width** `w` (logical/DIP units), keeping
+/// the window's current height and position.
+///
+/// # Safety
+/// `hwnd` must be a live top-level window handle owned by the calling thread.
+pub unsafe fn resize(hwnd: HWND, w: f64, _h: f64) -> Result<(), windows_core::Error> {
+    if w <= 0.0 || w.is_nan() {
+        return Err(windows_core::Error::new(
+            E_INVALIDARG,
+            "Width must be a finite, positive number.",
+        ));
+    }
+
+    let dpi = get_dpi(hwnd);
+
+    // determine the scale, so that we can take device-independent-pixel count, multiply it by the scale, and get the real pixel count
+    let scale = f64::from(dpi) / 96.0;
+
+    let wanted_internal_width = (w * scale).round() as i32;
+
+    // Get the bounds of the WHOLE window, including non-client area
+    let current_rect = {
+        let mut current = RECT {
+            left: 0,
+            top: 0,
+            right: 0,
+            bottom: 0,
+        };
+
+        // SAFETY: Win32 API call
+        unsafe { GetWindowRect(hwnd, &raw mut current) }?;
+
+        current
+    };
+
+    let current_width = current_rect.right - current_rect.left;
+    let current_height = current_rect.bottom - current_rect.top;
+
+    // Grow the desired client width into a full window width, honoring the
+    // window's actual styles and this monitor's DPI (left/right borders).
+    // We're only interested in the width, as we don't want to change the height.
+
+    let new_width = {
+        #[expect(
+            clippy::cast_sign_loss,
+            reason = "GetWindowLongPtrW returns GWL_STYLE in the lower 32-bits of the return value"
+        )]
+        // SAFETY: Win32 API call
+        let window_style = unsafe { WINDOW_STYLE(GetWindowLongPtrW(hwnd, GWL_STYLE) as u32) };
+
+        #[expect(
+            clippy::cast_sign_loss,
+            reason = "GetWindowLongPtrW returns GWL_EXSTYLE in the lower 32-bits of the return value"
+        )]
+        // SAFETY: Win32 API call
+        let window_ex_style =
+            unsafe { WINDOW_EX_STYLE(GetWindowLongPtrW(hwnd, GWL_EXSTYLE) as u32) };
+
+        let mut adjusted = RECT {
+            left: 0,
+            top: 0,
+            right: wanted_internal_width,
+            bottom: 0,
+        };
+
+        // add the non-client-area to our new width
+        // SAFETY: Win32 API call
+        unsafe {
+            AdjustWindowRectExForDpi(&raw mut adjusted, window_style, false, window_ex_style, dpi)
+        }?;
+
+        adjusted.right - adjusted.left
+    };
+
+    // Calculate the difference in width, and shift the window half of that to the left
+    let delta_width = new_width - current_width;
+    let new_x = current_rect.left - (delta_width / 2);
+
+    // We aren't changing height
+    let new_y = current_rect.top;
+
+    // nothing we can do if this fails
+    // SAFETY: Win32 API call
+    unsafe {
+        SetWindowPos(
+            hwnd,
+            None,
+            new_x,
+            new_y,
+            new_width,
+            current_height,
+            SWP_NOZORDER | SWP_NOACTIVATE,
+        )
+    }
 }

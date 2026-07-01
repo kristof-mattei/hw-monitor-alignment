@@ -3,9 +3,10 @@ use windows_reactor::{
 };
 
 use crate::monitor::Monitor;
+use crate::ui::sizeable::sizeable;
 
 /// Per-monitor info.
-pub fn info_panel(monitors: &[Monitor]) -> Element {
+pub fn info_panel<F: Fn(f64, f64) + 'static>(monitors: &[Monitor], on_sized: F) -> Element {
     // Show monitors left-to-right by virtual screen position.
     // TODO we should do this at the start
     let mut sorted: Vec<&Monitor> = monitors.iter().collect();
@@ -13,12 +14,14 @@ pub fn info_panel(monitors: &[Monitor]) -> Element {
 
     let boxes: Vec<Element> = sorted.iter().map(|m| monitor_box(m).into()).collect();
 
-    group_box(
+    let outer = group_box(
         "Monitor Setup Information",
         hstack(boxes).spacing(8.0).into(),
     )
-    .margin(Thickness::xy(16.0, 0.0))
-    .into()
+    .margin(Thickness::xy(16.0, 0.0));
+
+    // Resize observer on the OUTER panel.
+    sizeable(outer).on_resize(on_sized).into()
 }
 
 fn monitor_box(m: &Monitor) -> impl Into<Element> {
