@@ -80,12 +80,10 @@ impl CustomElement for SizeProbe {
         // function because it might be a closure on the stack.
 
         if let Some(other) = other.as_any().downcast_ref::<SizeProbe>() {
-            let result = match (&self.on_resize, &other.on_resize) {
+            match (&self.on_resize, &other.on_resize) {
                 (&None, &None) | (&Some(_), &Some(_)) => true,
                 (&None, &Some(_)) | (&Some(_), &None) => false,
-            };
-
-            result
+            }
         } else {
             false
         }
