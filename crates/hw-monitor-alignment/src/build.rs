@@ -1,3 +1,5 @@
+use std::process::Command;
+
 fn main() {
     windows_reactor_setup::as_framework_dependent();
 
@@ -27,7 +29,8 @@ fn main() {
 
     if !status.success() {
         println!(
-            "cargo:warning=Failed to format {}: rustfmt exited with {:?}",output_path
+            "cargo:warning=Failed to format {}: rustfmt exited with {:?}",
+            output_path,
             status.code()
         );
     }
