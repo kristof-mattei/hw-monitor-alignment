@@ -10,6 +10,3 @@ profiling/
 /profile.json
 
 .env
-
-/temp
-/winmd
