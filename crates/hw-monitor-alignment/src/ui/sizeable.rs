@@ -75,10 +75,22 @@ impl CustomElement for SizeProbe {
     }
 
     fn eq_dyn(&self, other: &dyn CustomElement) -> bool {
-        // Callbacks aren't comparable, so two probes are treated as equal:
-        // The reconciler then never tears the control down and re-subscribes on re-render.
-        // The subscription (and the callback it captured) is established once, at mount.
-        other.as_any().downcast_ref::<SizeProbe>().is_some()
+        // Callbacks aren't comparable. We're making two probes to be treated as equal, for as long as they have a callback.
+        // This is probably incorrect, but I cannot think of a better way right now. We cannot get a pointer to the underlying
+        // function because it might be a closure on the stack.
+
+        if let Some(other) = other.as_any().downcast_ref::<SizeProbe>() {
+            let result = match (&self.on_resize, &other.on_resize) {
+                (&None, &None) | (&Some(_), &Some(_)) => true,
+                (&None, &Some(_)) | (&Some(_), &None) => false,
+            };
+
+            println!("{:?}", result);
+
+            result
+        } else {
+            false
+        }
     }
 
     fn clone_dyn(&self) -> Box<dyn CustomElement> {

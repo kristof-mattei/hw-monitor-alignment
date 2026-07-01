@@ -13,6 +13,19 @@ use crate::monitor::Monitor;
 use crate::ui::overview::overview_canvas;
 use crate::win32::window_style;
 
+fn on_resize(w: f64, h: f64) {
+    // Once the UI mounts and the window is active, grab the HWND
+    // SAFETY: failure mode is returning an `HWND` where `.is_invalid()` returns `true`.
+    let hwnd: HWND = unsafe { GetActiveWindow() };
+
+    if !hwnd.is_invalid() {
+        // SAFETY: `hwnd` is valid.
+        unsafe {
+            window_style::resize(hwnd, w, h).expect("Could not resize window");
+        }
+    }
+}
+
 pub fn render(cx: &mut RenderCx, monitors: &Arc<[Monitor]>) -> impl Into<Element> {
     let (adjusting, set_adjusting) = cx.use_state(false);
     // TODO this shouldn't clone the monitors
@@ -55,22 +68,10 @@ pub fn render(cx: &mut RenderCx, monitors: &Arc<[Monitor]>) -> impl Into<Element
             .horizontal_alignment(HorizontalAlignment::Center)
             .margin(Thickness::uniform(16.0))
             .grid_row(0),
-        info_panel(&display_monitors, |w, h| {
-            // Once the UI mounts and the window is active, grab the HWND
-            // SAFETY: failure mode is returning an `HWND` where `.is_invalid()` returns `true`.
-            let hwnd: HWND = unsafe { GetActiveWindow() };
-
-            if !hwnd.is_invalid() {
-                // SAFETY: `hwnd` is valid.
-                unsafe {
-                    eprintln!("HYO");
-                    window_style::resize(hwnd, w, h).expect("Could not resize window");
-                }
-            }
-        })
-        .horizontal_alignment(HorizontalAlignment::Stretch)
-        .vertical_alignment(VerticalAlignment::Stretch)
-        .grid_row(1),
+        info_panel(&display_monitors, on_resize)
+            .horizontal_alignment(HorizontalAlignment::Stretch)
+            .vertical_alignment(VerticalAlignment::Stretch)
+            .grid_row(1),
         button_bar.grid_row(2),
     ))
     .rows([
