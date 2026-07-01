@@ -1,5 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 #![expect(clippy::as_conversions, reason = "WIP")]
+#![expect(clippy::cast_possible_truncation, reason = "WIP")]
 #![expect(clippy::cast_possible_wrap, reason = "WIP")]
 #![expect(clippy::disallowed_names, reason = "WIP")]
 #![expect(clippy::struct_field_names, reason = "WIP")]
@@ -8,6 +9,17 @@ use std::sync::Arc;
 
 use windows_reactor::{App, Result, bootstrap};
 
+#[expect(
+    non_snake_case,
+    clippy::absolute_paths,
+    clippy::borrow_as_ptr,
+    clippy::multiple_unsafe_ops_per_block,
+    clippy::partial_pub_fields,
+    clippy::ptr_as_ptr,
+    clippy::transmute_ptr_to_ptr,
+    clippy::undocumented_unsafe_blocks,
+    reason = "Generated"
+)]
 mod bindings;
 mod monitor;
 mod ui;
