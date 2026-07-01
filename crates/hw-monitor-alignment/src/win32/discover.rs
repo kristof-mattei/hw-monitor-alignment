@@ -13,6 +13,9 @@ fn wstr_to_string(buf: &[u16]) -> String {
     String::from_utf16_lossy(buf)
 }
 
+/// Discovers all the monitors on a system.
+///
+/// Return value is sorted by the monitor's (x, y).
 pub fn discover_monitors() -> Vec<Monitor> {
     // Friendly names come from a separate CCD-API pass, keyed by device path.
     let friendly_names = friendly::discover_friendly_names();
@@ -112,10 +115,7 @@ pub fn discover_monitors() -> Vec<Monitor> {
         i_dev += 1;
     }
 
-    let c = monitors[0].clone();
-    monitors.push(c);
-    let c = monitors[0].clone();
-    monitors.push(c);
+    monitors.sort_by_key(|m| (m.x, m.y));
 
     monitors
 }
