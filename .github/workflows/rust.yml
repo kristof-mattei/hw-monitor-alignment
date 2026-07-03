@@ -9,8 +9,11 @@ permissions:
 
 env:
   CARGO_FEATURES: --all-features
+  CARGO_INCREMENTAL: "0"
   CARGO_TERM_COLOR: always
   RUSTFLAGS: --deny=warnings
+  RUSTC_WRAPPER: "sccache"
+  SCCACHE_GHA_ENABLED: "true"
 
 jobs:
   warm-up-cache:
@@ -42,11 +45,11 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-          key: ${{ runner.os }}-${{ runner.arch }}-build-${{ env.CACHE_NAME }}-${{ hashFiles('Cargo.lock') }}-${{ github.workflow }}-warm-up-cache
+          key: ${{ runner.os }}-${{ runner.arch }}-${{ env.CACHE_NAME }}-${{ hashFiles('Cargo.lock') }}-${{ github.workflow }}-warm-up-cache
           restore-keys: |
-            ${{ runner.os }}-${{ runner.arch }}-build-${{ env.CACHE_NAME }}-${{ hashFiles('Cargo.lock') }}-${{ github.workflow }}-
-            ${{ runner.os }}-${{ runner.arch }}-build-${{ env.CACHE_NAME }}-${{ hashFiles('Cargo.lock') }}-
-            ${{ runner.os }}-${{ runner.arch }}-build-${{ env.CACHE_NAME }}-
+            ${{ runner.os }}-${{ runner.arch }}-${{ env.CACHE_NAME }}-${{ hashFiles('Cargo.lock') }}-${{ github.workflow }}-
+            ${{ runner.os }}-${{ runner.arch }}-${{ env.CACHE_NAME }}-${{ hashFiles('Cargo.lock') }}-
+            ${{ runner.os }}-${{ runner.arch }}-${{ env.CACHE_NAME }}-
 
       - &set_up_mold
         name: Set up mold
@@ -66,6 +69,10 @@ jobs:
           rustup show
 
           cargo --version
+
+      - &set_up_sccache
+        name: Set up sccache
+        uses: mozilla-actions/sccache-action@9e7fa8a12102821edf02ca5dbea1acd0f89a2696 # v0.0.10
 
       - name: Fetch
         shell: pwsh
@@ -102,10 +109,12 @@ jobs:
 
       - &cache_cargo_windows
         name: Cache cargo
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         env:
           CACHE_NAME: cargo
         with:
+          # we want to fail if `warm-up-cache` fails
+          fail-on-cache-miss: true
           path: |
             ~/.cargo/.crates.toml
             ~/.cargo/.crates2.json
@@ -113,18 +122,18 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-          key: ${{ runner.os }}-${{ runner.arch }}-build-${{ env.CACHE_NAME }}-${{ hashFiles('Cargo.lock') }}-${{ github.workflow }}-warm-up-cache
-          restore-keys: |
-            ${{ runner.os }}-${{ runner.arch }}-build-${{ env.CACHE_NAME }}-${{ hashFiles('Cargo.lock') }}-${{ github.workflow }}-
+          key: ${{ runner.os }}-${{ runner.arch }}-${{ env.CACHE_NAME }}-${{ hashFiles('Cargo.lock') }}-${{ github.workflow }}-warm-up-cache
 
       - *set_up_mold
 
       - *set_up_toolchain_windows
 
+      - *set_up_sccache
+
       - name: Build
         shell: pwsh
         run: |
-          cargo build --all-features --all-targets --locked --workspace --verbose
+          cargo build ${{ env.CARGO_FEATURES }} --all-targets --frozen --workspace
 
   cargo-fmt-windows:
     name: Cargo fmt
@@ -139,8 +148,6 @@ jobs:
       - *disable_autocrlf
 
       - *checkout
-
-      - *cache_cargo_windows
 
       - *set_up_toolchain_windows
 
@@ -177,6 +184,8 @@ jobs:
 
       - *set_up_toolchain_windows
 
+      - *set_up_sccache
+
       - name: Install llvm-tools
         shell: pwsh
         run: |
@@ -197,7 +206,7 @@ jobs:
           # build-* ones are not parsed by grcov
           LLVM_PROFILE_FILE: "profiling/build-%p-%m.profraw"
         run: |
-          cargo build --all-features --all-targets --locked --workspace --verbose
+          cargo build ${{ env.CARGO_FEATURES }} --all-targets --frozen --workspace
 
       - name: Run nextest
         shell: pwsh
@@ -206,7 +215,7 @@ jobs:
           RUSTFLAGS: "${{ env.RUSTFLAGS }} --allow=warnings -Cinstrument-coverage"
           LLVM_PROFILE_FILE: "profiling/profile-%p-%m.profraw"
         run: |
-          cargo nextest run --profile ci --no-fail-fast --all-targets --all-features --workspace
+          cargo nextest run --profile ci --no-fail-fast ${{ env.CARGO_FEATURES }} --all-targets --workspace
         continue-on-error: true
 
       - name: Upload test results
@@ -251,7 +260,7 @@ jobs:
           flags: windows
           files: reports/lcov
           name: code-coverage
-          plugins: ""
+          plugins: noop
           report_type: "coverage"
           use_oidc: true
 
@@ -265,7 +274,7 @@ jobs:
           flags: windows
           files: reports/results.xml
           name: test-results
-          plugins: ""
+          plugins: noop
           report_type: "test_results"
           use_oidc: true
 
@@ -301,10 +310,12 @@ jobs:
 
       - *set_up_toolchain_windows
 
+      - *set_up_sccache
+
       - name: Run Clippy for GitHub Actions report
         uses: actions-rs-plus/clippy-check@23b52efac3da0e2b197a9ad2e7be0f515502aaaf # v2.5.0
         with:
-          args: ${{ env.CARGO_FEATURES }} --all-targets --locked --workspace
+          args: ${{ env.CARGO_FEATURES }} --all-targets --frozen --workspace
 
   all-done:
     name: Rust All done
