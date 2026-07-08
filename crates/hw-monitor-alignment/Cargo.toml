@@ -17,7 +17,7 @@ default = []
 
 [dependencies]
 hashbrown = "=0.17.1"
-windows = { git = "https://github.com/microsoft/windows-rs", features = [
+windows = { git = "https://github.com/microsoft/windows-rs", rev = "b1e29d48be9ba4c85f8415666b71ad6714097e73", features = [
     "Win32_System_WinRT",
     "Win32_UI_Shell",
     "Win32_Foundation",
@@ -30,13 +30,13 @@ windows = { git = "https://github.com/microsoft/windows-rs", features = [
     "Win32_UI_Input_KeyboardAndMouse",
     "Win32_System_LibraryLoader",
 ] }
-windows-core = { git = "https://github.com/microsoft/windows-rs" }
-windows-reactor = { git = "https://github.com/microsoft/windows-rs" }
+windows-core = { git = "https://github.com/microsoft/windows-rs", rev = "b1e29d48be9ba4c85f8415666b71ad6714097e73" }
+windows-reactor = { git = "https://github.com/microsoft/windows-rs", rev = "b1e29d48be9ba4c85f8415666b71ad6714097e73" }
 
 [build-dependencies]
-windows-bindgen = { git = "https://github.com/microsoft/windows-rs" }
-windows-rdl = { git = "https://github.com/microsoft/windows-rs" }
-windows-reactor-setup = { git = "https://github.com/microsoft/windows-rs" }
+windows-bindgen = { git = "https://github.com/microsoft/windows-rs", rev = "b1e29d48be9ba4c85f8415666b71ad6714097e73" }
+windows-rdl = { git = "https://github.com/microsoft/windows-rs", rev = "b1e29d48be9ba4c85f8415666b71ad6714097e73" }
+windows-reactor-setup = { git = "https://github.com/microsoft/windows-rs", rev = "b1e29d48be9ba4c85f8415666b71ad6714097e73" }
 
 [dev-dependencies]
 pretty_assertions = "=1.4.1"
