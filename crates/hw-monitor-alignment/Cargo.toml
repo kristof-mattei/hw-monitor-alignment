@@ -17,7 +17,7 @@ default = []
 
 [dependencies]
 hashbrown = "=0.17.1"
-windows = { git = "https://github.com/microsoft/windows-rs", rev = "b1e29d48be9ba4c85f8415666b71ad6714097e73", features = [
+windows = { git = "https://github.com/microsoft/windows-rs", rev = "7ab06f86269c7ca76446d980920854e0833a021a", features = [
     "Win32_System_WinRT",
     "Win32_UI_Shell",
     "Win32_Foundation",
