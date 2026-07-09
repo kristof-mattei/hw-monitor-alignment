@@ -8,9 +8,15 @@
     ],
     "packageRules": [
         {
-            "description": "Group windows updates together",
+            "description": "Group windows updates together (git deps: packageName is the repo URL, so match on depName)",
             "matchManagers": ["cargo"],
-            "matchPackageNames": ["windows", "windows-**"],
+            "matchDepNames": ["windows", "windows-*"],
+            "groupName": "windows"
+        },
+        {
+            "description": "Group windows updates together (crates.io)",
+            "matchManagers": ["cargo"],
+            "matchPackageNames": ["windows", "windows-*"],
             "groupName": "windows"
         }
     ]
