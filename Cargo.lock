@@ -187,7 +187,7 @@ source = "git+https://github.com/microsoft/windows-rs?rev=b1e29d48be9ba4c85f8415
 [[package]]
 name = "windows-metadata"
 version = "0.60.0"
-source = "git+https://github.com/microsoft/windows-rs?rev=b1e29d48be9ba4c85f8415666b71ad6714097e73#b1e29d48be9ba4c85f8415666b71ad6714097e73"
+source = "git+https://github.com/microsoft/windows-rs?rev=7ab06f86269c7ca76446d980920854e0833a021a#7ab06f86269c7ca76446d980920854e0833a021a"
 
 [[package]]
 name = "windows-metadata"
@@ -206,12 +206,12 @@ dependencies = [
 [[package]]
 name = "windows-rdl"
 version = "0.0.0"
-source = "git+https://github.com/microsoft/windows-rs?rev=b1e29d48be9ba4c85f8415666b71ad6714097e73#b1e29d48be9ba4c85f8415666b71ad6714097e73"
+source = "git+https://github.com/microsoft/windows-rs?rev=7ab06f86269c7ca76446d980920854e0833a021a#7ab06f86269c7ca76446d980920854e0833a021a"
 dependencies = [
  "proc-macro2",
  "quote",
  "syn",
- "windows-metadata 0.60.0 (git+https://github.com/microsoft/windows-rs?rev=b1e29d48be9ba4c85f8415666b71ad6714097e73)",
+ "windows-metadata 0.60.0 (git+https://github.com/microsoft/windows-rs?rev=7ab06f86269c7ca76446d980920854e0833a021a)",
 ]
 
 [[package]]
