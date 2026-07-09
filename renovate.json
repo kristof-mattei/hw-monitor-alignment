@@ -5,5 +5,13 @@
         "github>kristof-mattei/renovate-config//github-actions/nonSemver",
         "github>kristof-mattei/renovate-config//rust/updateRustVersionInCargoToml",
         "github>kristof-mattei/renovate-config//rust/updateChannelInRustToolchainToml"
+    ],
+    "packageRules": [
+        {
+            "description": "Group windows updates together",
+            "matchManagers": ["cargo"],
+            "matchPackageNames": ["windows", "windows-**"],
+            "groupName": "windows"
+        }
     ]
 }
