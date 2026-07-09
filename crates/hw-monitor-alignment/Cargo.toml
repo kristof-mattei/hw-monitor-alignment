@@ -34,7 +34,7 @@ windows-core = { git = "https://github.com/microsoft/windows-rs", rev = "b1e29d4
 windows-reactor = { git = "https://github.com/microsoft/windows-rs", rev = "b1e29d48be9ba4c85f8415666b71ad6714097e73" }
 
 [build-dependencies]
-windows-bindgen = { git = "https://github.com/microsoft/windows-rs", rev = "d93cd3a1e795454e1adb98ac4e1385d7c0a76243" }
+windows-bindgen = { git = "https://github.com/microsoft/windows-rs", rev = "7ab06f86269c7ca76446d980920854e0833a021a" }
 windows-rdl = { git = "https://github.com/microsoft/windows-rs", rev = "b1e29d48be9ba4c85f8415666b71ad6714097e73" }
 windows-reactor-setup = { git = "https://github.com/microsoft/windows-rs", rev = "b1e29d48be9ba4c85f8415666b71ad6714097e73" }
 
