@@ -1,8 +1,7 @@
 use std::sync::Arc;
 
-use windows::Win32::Foundation::HWND;
-use windows::Win32::UI::Input::KeyboardAndMouse::GetActiveWindow;
-use windows::Win32::UI::WindowsAndMessaging::PostQuitMessage;
+use windows::windef::HWND;
+use windows::winuser::{GetActiveWindow, PostQuitMessage};
 use windows_reactor::{
     ContentDialog, Element, ElementExt as _, GridLength, HorizontalAlignment, RenderCx, SetState,
     Thickness, VerticalAlignment, button, grid, hstack,
@@ -18,7 +17,7 @@ fn on_resize(w: f64, h: f64) {
     // SAFETY: failure mode is returning an `HWND` where `.is_invalid()` returns `true`.
     let hwnd: HWND = unsafe { GetActiveWindow() };
 
-    if !hwnd.is_invalid() {
+    if !hwnd.0.is_null() {
         // SAFETY: `hwnd` is valid.
         unsafe {
             window_style::resize(hwnd, w, h).expect("Could not resize window");
@@ -37,7 +36,7 @@ pub fn render(cx: &mut RenderCx, monitors: &Arc<[Monitor]>) -> impl Into<Element
         // SAFETY: failure mode is returning `NULL`
         let hwnd: HWND = unsafe { GetActiveWindow() };
 
-        if !hwnd.is_invalid() {
+        if !hwnd.0.is_null() {
             window_style::make_fixed(hwnd).expect("Failed to make window fixed");
         }
     });
