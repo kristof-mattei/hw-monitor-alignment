@@ -3,7 +3,9 @@
 #![expect(clippy::cast_possible_truncation, reason = "WIP")]
 #![expect(clippy::cast_possible_wrap, reason = "WIP")]
 #![expect(clippy::disallowed_names, reason = "WIP")]
+#![expect(clippy::struct_excessive_bools, reason = "WIP")]
 #![expect(clippy::struct_field_names, reason = "WIP")]
+#![expect(clippy::too_many_lines, reason = "WIP")]
 
 use std::sync::Arc;
 
@@ -22,6 +24,7 @@ use windows_reactor::{App, Result, bootstrap};
 )]
 mod bindings;
 mod monitor;
+mod state;
 mod ui;
 mod win32;
 

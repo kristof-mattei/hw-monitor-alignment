@@ -1,16 +1,19 @@
+use std::rc::Rc;
 use std::sync::Arc;
+use std::time::Duration;
 
 use windows::windef::HWND;
 use windows::winuser::{GetActiveWindow, PostQuitMessage};
 use windows_reactor::{
-    ContentDialog, Element, ElementExt as _, GridLength, HorizontalAlignment, RenderCx, SetState,
-    Thickness, VerticalAlignment, button, grid, hstack,
+    ContentDialog, DispatcherTimer, Element, ElementExt as _, GridLength, HorizontalAlignment,
+    RenderCx, SetState, Thickness, VerticalAlignment, button, grid, hstack,
 };
 
 use super::info_panel::info_panel;
 use crate::monitor::Monitor;
+use crate::state::{AdjustSession, SharedSession};
 use crate::ui::overview::overview_canvas;
-use crate::win32::window_style;
+use crate::win32::{discover, overlay, window_style};
 
 fn on_resize(w: f64, h: f64) {
     // Once the UI mounts and the window is active, grab the HWND
@@ -27,8 +30,8 @@ fn on_resize(w: f64, h: f64) {
 
 pub fn render(cx: &mut RenderCx, monitors: &Arc<[Monitor]>) -> impl Into<Element> {
     let (adjusting, set_adjusting) = cx.use_state(false);
-    // TODO this shouldn't clone the monitors
-    let (display_monitors, _set_display_monitors) = cx.use_state(Arc::clone(monitors));
+
+    let (display_monitors, set_display_monitors) = cx.use_state(Arc::clone(monitors));
     let (show_about, set_show_about) = cx.use_state(false);
 
     cx.use_effect((), || {
@@ -41,26 +44,97 @@ pub fn render(cx: &mut RenderCx, monitors: &Arc<[Monitor]>) -> impl Into<Element
         }
     });
 
-    let set_adjust_button = set_adjusting.clone();
-    let set_about_button = set_show_about.clone();
-    let set_about_close = set_show_about.clone();
+    {
+        let monitors = Arc::clone(monitors);
+        let set_adjusting = SetState::clone(&set_adjusting);
 
-    let button_bar = grid((
-        button("About")
-            .on_click(move || set_about_button.call(true))
-            .horizontal_alignment(HorizontalAlignment::Left)
-            .grid_column(0),
-        hstack([
-            button(if adjusting { "Stop" } else { "Adjust" })
-                .on_click(move || set_adjust_button.call(!adjusting)),
-            button("Close").on_click(close_app),
-        ])
-        .spacing(8.0)
-        .horizontal_alignment(HorizontalAlignment::Right)
-        .grid_column(1),
-    ))
-    .columns([GridLength::STAR, GridLength::STAR])
-    .margin(Thickness::uniform(16.0));
+        cx.use_effect_with_cleanup(adjusting, move || {
+            if !adjusting {
+                return None::<Box<dyn FnOnce()>>;
+            }
+
+            let session: SharedSession = Rc::new(std::sync::Mutex::new(AdjustSession::new(
+                Arc::clone(&monitors),
+            )));
+
+            overlay::create_overlays(&session);
+
+            let last_version = std::cell::Cell::new(0_u64);
+
+            let timer = {
+                let session = Rc::clone(&session);
+                let set_display_monitors = SetState::clone(&set_display_monitors);
+
+                DispatcherTimer::new(Duration::from_millis(100), move || {
+                    let lock = session
+                        .lock()
+                        .unwrap_or_else(std::sync::PoisonError::into_inner);
+
+                    if lock.stop_requested {
+                        drop(lock);
+
+                        set_adjusting.call(false);
+
+                        return;
+                    }
+
+                    if lock.version != last_version.get() {
+                        last_version.set(lock.version);
+
+                        let updated = lock.monitors_with_working_y().into();
+
+                        drop(lock);
+
+                        set_display_monitors.call(updated);
+                    }
+                })
+                .ok()
+            };
+
+            let cleanp: Box<dyn FnOnce()> = {
+                let session = Rc::clone(&session);
+                let set_display = SetState::clone(&set_display_monitors);
+
+                Box::new(move || {
+                    drop(timer);
+
+                    overlay::destroy_remaining_overlays(&session);
+
+                    // Re-read actual OS positions so the overview reflects the final state.
+                    let fresh = discover::discover_monitors().into();
+
+                    // TODO assert fresh mathes our state
+
+                    set_display.call(fresh);
+                })
+            };
+
+            Some(cleanp)
+        });
+    }
+
+    let button_bar = {
+        grid((
+            {
+                let set_show_about = SetState::clone(&set_show_about);
+
+                button("About")
+                    .on_click(move || set_show_about.call(true))
+                    .horizontal_alignment(HorizontalAlignment::Left)
+                    .grid_column(0)
+            },
+            hstack([
+                button(if adjusting { "Stop" } else { "Adjust" })
+                    .on_click(move || set_adjusting.call(!adjusting)),
+                button("Close").on_click(close_app),
+            ])
+            .spacing(8.0)
+            .horizontal_alignment(HorizontalAlignment::Right)
+            .grid_column(1),
+        ))
+        .columns([GridLength::STAR, GridLength::STAR])
+        .margin(Thickness::uniform(16.0))
+    };
 
     let layout = grid((
         overview_canvas(&display_monitors)
@@ -81,7 +155,7 @@ pub fn render(cx: &mut RenderCx, monitors: &Arc<[Monitor]>) -> impl Into<Element
     .horizontal_alignment(HorizontalAlignment::Stretch)
     .vertical_alignment(VerticalAlignment::Stretch);
 
-    let children: Vec<Element> = vec![layout.into(), content_dialog(show_about, set_about_close)];
+    let children: Vec<Element> = vec![layout.into(), content_dialog(show_about, set_show_about)];
 
     grid(children)
         .horizontal_alignment(HorizontalAlignment::Stretch)
