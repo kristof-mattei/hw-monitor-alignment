@@ -19,6 +19,8 @@ default = []
 hashbrown = "=0.17.1"
 windows = { git = "https://github.com/microsoft/windows-rs", rev = "4a73257f9a2c28708c0325808e3dce1bd6f90b23", features = [
     "errhandlingapi",
+    "libloaderapi",
+    "minwindef",
     "windef",
     "winerror",
     "wingdi",

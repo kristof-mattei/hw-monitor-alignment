@@ -11,10 +11,6 @@ use windows_core::PCWSTR;
 use crate::monitor::{Monitor, Orientation};
 use crate::win32::friendly;
 
-fn wstr_to_string(buf: &[u16]) -> String {
-    String::from_utf16_lossy(buf)
-}
-
 /// Discovers all the monitors on a system.
 ///
 /// Return value is sorted by the monitor's (x, y).
@@ -88,7 +84,7 @@ pub fn discover_monitors() -> Vec<Monitor> {
                     let display = unsafe { devmode.Anonymous.Anonymous2 };
                     let pos = display.dmPosition;
 
-                    let device_id = wstr_to_string(&ddm.DeviceID);
+                    let device_id = String::from_utf16_lossy(&ddm.DeviceID);
 
                     // fetch friendly name
                     let friendly_monitor_name = friendly_names
@@ -97,10 +93,10 @@ pub fn discover_monitors() -> Vec<Monitor> {
                         .to_owned();
 
                     monitors.push(Monitor {
-                        device_name: wstr_to_string(&dd.DeviceName).into(),
-                        monitor_name: wstr_to_string(&ddm.DeviceString).into(),
+                        device_name: String::from_utf16_lossy(&dd.DeviceName).into(),
+                        monitor_name: String::from_utf16_lossy(&ddm.DeviceString).into(),
                         friendly_monitor_name: friendly_monitor_name.into(),
-                        display_adapter: wstr_to_string(&dd.DeviceString).into(),
+                        display_adapter: String::from_utf16_lossy(&dd.DeviceString).into(),
                         width: devmode.dmPelsWidth,
                         height: devmode.dmPelsHeight,
                         x: pos.x,

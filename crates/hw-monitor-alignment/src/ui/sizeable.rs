@@ -128,7 +128,7 @@ impl CustomElement for SizeProbe {
             if let Ok(size_revoker) = size_revoker {
                 #[expect(
                     clippy::mem_forget,
-                    reason = "subscription must outlive this scope; mirrors framework"
+                    reason = "subscription must outlive this scope, mirrors framework"
                 )]
                 std::mem::forget(size_revoker);
             }
