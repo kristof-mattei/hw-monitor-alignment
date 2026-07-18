@@ -1,9 +1,11 @@
-use windows::Win32::Foundation::{E_INVALIDARG, HWND, RECT, SetLastError};
-use windows::Win32::UI::HiDpi::{AdjustWindowRectExForDpi, GetDpiForSystem, GetDpiForWindow};
-use windows::Win32::UI::WindowsAndMessaging::{
-    GWL_EXSTYLE, GWL_STYLE, GetWindowLongPtrW, GetWindowRect, SWP_FRAMECHANGED, SWP_NOACTIVATE,
-    SWP_NOMOVE, SWP_NOSIZE, SWP_NOZORDER, SetWindowLongPtrW, SetWindowPos, USER_DEFAULT_SCREEN_DPI,
-    WINDOW_EX_STYLE, WINDOW_STYLE, WS_MAXIMIZEBOX, WS_THICKFRAME,
+use windows::errhandlingapi::SetLastError;
+use windows::windef::{HWND, RECT};
+use windows::winerror::E_INVALIDARG;
+use windows::winuser::{
+    AdjustWindowRectExForDpi, GWL_EXSTYLE, GWL_STYLE, GetDpiForSystem, GetDpiForWindow,
+    GetWindowLongPtrW, GetWindowRect, SWP_FRAMECHANGED, SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE,
+    SWP_NOZORDER, SetWindowLongPtrW, SetWindowPos, USER_DEFAULT_SCREEN_DPI, WS_MAXIMIZEBOX,
+    WS_THICKFRAME,
 };
 use windows_core::WIN32_ERROR;
 
@@ -13,7 +15,7 @@ use windows_core::WIN32_ERROR;
 pub fn make_fixed(hwnd: HWND) -> Result<(), windows_reactor::Error> {
     // SAFETY: Clear the error state before querying so we don't read stale errors.
     unsafe {
-        SetLastError(WIN32_ERROR(0));
+        SetLastError(0);
     }
 
     // SAFETY: Even an invalid `hwnd` won't make this fail
@@ -25,21 +27,19 @@ pub fn make_fixed(hwnd: HWND) -> Result<(), windows_reactor::Error> {
     }
 
     // drop `WS_THICKFRAME` and `WS_MAXIMIZEBOX` so it can't be resized and shows no resize cursor on its edges.
-    let fixed = WINDOW_STYLE(
-        style
-            .try_into()
-            .expect("GetWindowLongPtrW(hwnd, GWL_STYLE) returns WINDOW_STYLE"),
-    ) & !(WS_THICKFRAME | WS_MAXIMIZEBOX);
+    let fixed: u32 = u32::try_from(style)
+        .expect("GetWindowLongPtrW(hwnd, GWL_STYLE) returns a window style")
+        & !(WS_THICKFRAME | WS_MAXIMIZEBOX);
 
     // SAFETY: unset the errors so we can properly inspect return values
     unsafe {
-        SetLastError(WIN32_ERROR(0));
+        SetLastError(0);
     }
 
     // SAFETY: `hwnd` is valid, so is the `fixed` style
     let result = unsafe {
         // set style
-        SetWindowLongPtrW(hwnd, GWL_STYLE, fixed.0 as isize)
+        SetWindowLongPtrW(hwnd, GWL_STYLE, fixed as isize)
     };
 
     // A return of 0 is the only indicator that we need to check the error state.
@@ -58,7 +58,8 @@ pub fn make_fixed(hwnd: HWND) -> Result<(), windows_reactor::Error> {
             0,
             SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED,
         )
-    }?;
+    }
+    .ok()?;
 
     Ok(())
 }
@@ -111,7 +112,7 @@ pub unsafe fn resize(hwnd: HWND, w: f64, _h: f64) -> Result<(), windows_core::Er
         };
 
         // SAFETY: Win32 API call
-        unsafe { GetWindowRect(hwnd, &raw mut current) }?;
+        unsafe { GetWindowRect(hwnd, &raw mut current) }.ok()?;
 
         current
     };
@@ -129,15 +130,14 @@ pub unsafe fn resize(hwnd: HWND, w: f64, _h: f64) -> Result<(), windows_core::Er
             reason = "GetWindowLongPtrW returns GWL_STYLE in the lower 32-bits of the return value"
         )]
         // SAFETY: Win32 API call
-        let window_style = unsafe { WINDOW_STYLE(GetWindowLongPtrW(hwnd, GWL_STYLE) as u32) };
+        let window_style = unsafe { GetWindowLongPtrW(hwnd, GWL_STYLE) as u32 };
 
         #[expect(
             clippy::cast_sign_loss,
             reason = "GetWindowLongPtrW returns GWL_EXSTYLE in the lower 32-bits of the return value"
         )]
         // SAFETY: Win32 API call
-        let window_ex_style =
-            unsafe { WINDOW_EX_STYLE(GetWindowLongPtrW(hwnd, GWL_EXSTYLE) as u32) };
+        let window_ex_style = unsafe { GetWindowLongPtrW(hwnd, GWL_EXSTYLE) as u32 };
 
         let mut adjusted = RECT {
             left: 0,
@@ -150,7 +150,8 @@ pub unsafe fn resize(hwnd: HWND, w: f64, _h: f64) -> Result<(), windows_core::Er
         // SAFETY: Win32 API call
         unsafe {
             AdjustWindowRectExForDpi(&raw mut adjusted, window_style, false, window_ex_style, dpi)
-        }?;
+        }
+        .ok()?;
 
         adjusted.right - adjusted.left
     };
@@ -175,4 +176,5 @@ pub unsafe fn resize(hwnd: HWND, w: f64, _h: f64) -> Result<(), windows_core::Er
             SWP_NOZORDER | SWP_NOACTIVATE,
         )
     }
+    .ok()
 }

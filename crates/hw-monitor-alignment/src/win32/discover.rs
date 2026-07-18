@@ -1,9 +1,11 @@
-use windows::Win32::Graphics::Gdi::{
+use windows::wingdi::{
     DEVMODEW, DISPLAY_DEVICE_ATTACHED_TO_DESKTOP, DISPLAY_DEVICE_MIRRORING_DRIVER,
-    DISPLAY_DEVICE_PRIMARY_DEVICE, DISPLAY_DEVICEW, ENUM_REGISTRY_SETTINGS, EnumDisplayDevicesW,
+    DISPLAY_DEVICE_PRIMARY_DEVICE, DISPLAY_DEVICEW,
+};
+use windows::winuser::{
+    EDD_GET_DEVICE_INTERFACE_NAME, ENUM_REGISTRY_SETTINGS, EnumDisplayDevicesW,
     EnumDisplaySettingsW,
 };
-use windows::Win32::UI::WindowsAndMessaging::EDD_GET_DEVICE_INTERFACE_NAME;
 use windows_core::PCWSTR;
 
 use crate::monitor::{Monitor, Orientation};
@@ -32,7 +34,7 @@ pub fn discover_monitors() -> Vec<Monitor> {
 
         // SAFETY: dd is initialised above and lives for the call duration.
         let found_display_adaptor =
-            unsafe { EnumDisplayDevicesW(None, i_dev, &raw mut dd, 0) }.as_bool();
+            unsafe { EnumDisplayDevicesW(PCWSTR::null(), i_dev, &raw mut dd, 0) }.as_bool();
 
         if !found_display_adaptor {
             break;
@@ -62,8 +64,8 @@ pub fn discover_monitors() -> Vec<Monitor> {
                 break;
             }
 
-            let is_attached = ddm.StateFlags.contains(DISPLAY_DEVICE_ATTACHED_TO_DESKTOP);
-            let is_mirroring = ddm.StateFlags.contains(DISPLAY_DEVICE_MIRRORING_DRIVER);
+            let is_attached = (ddm.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP) != 0;
+            let is_mirroring = (ddm.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER) != 0;
 
             if is_attached && !is_mirroring {
                 let mut devmode = DEVMODEW {
@@ -83,7 +85,7 @@ pub fn discover_monitors() -> Vec<Monitor> {
 
                 if ok {
                     // SAFETY: reading nested anonymous union.
-                    let display = unsafe { devmode.Anonymous1.Anonymous2 };
+                    let display = unsafe { devmode.Anonymous.Anonymous2 };
                     let pos = display.dmPosition;
 
                     let device_id = wstr_to_string(&ddm.DeviceID);
@@ -104,7 +106,7 @@ pub fn discover_monitors() -> Vec<Monitor> {
                         x: pos.x,
                         y: pos.y,
                         orientation: Orientation::from_dmdo(display.dmDisplayOrientation),
-                        primary: dd.StateFlags.contains(DISPLAY_DEVICE_PRIMARY_DEVICE),
+                        primary: (dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE) != 0,
                     });
                 }
             }

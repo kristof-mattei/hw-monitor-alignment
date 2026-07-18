@@ -9,13 +9,15 @@ use std::ffi::OsString;
 use std::os::windows::ffi::OsStringExt as _;
 
 use hashbrown::HashMap;
-use windows::Win32::Devices::Display::{
+use windows::winerror::ERROR_SUCCESS;
+use windows::wingdi::{
     DISPLAYCONFIG_DEVICE_INFO_GET_TARGET_NAME, DISPLAYCONFIG_DEVICE_INFO_HEADER,
     DISPLAYCONFIG_MODE_INFO, DISPLAYCONFIG_PATH_INFO, DISPLAYCONFIG_TARGET_DEVICE_NAME,
-    DisplayConfigGetDeviceInfo, GetDisplayConfigBufferSizes, QDC_ONLY_ACTIVE_PATHS,
-    QueryDisplayConfig,
+    QDC_ONLY_ACTIVE_PATHS,
 };
-use windows::Win32::Foundation::ERROR_SUCCESS;
+use windows::winuser::{
+    DisplayConfigGetDeviceInfo, GetDisplayConfigBufferSizes, QueryDisplayConfig,
+};
 use windows_core::WIN32_ERROR;
 
 fn trim(mut wide: &[u16]) -> &[u16] {
@@ -48,7 +50,7 @@ pub fn discover_friendly_names() -> HashMap<String, String> {
         )
     };
 
-    if rc != ERROR_SUCCESS || num_path_array_elements == 0 {
+    if rc.cast_unsigned() != ERROR_SUCCESS || num_path_array_elements == 0 {
         return HashMap::new();
     }
 
@@ -66,11 +68,11 @@ pub fn discover_friendly_names() -> HashMap<String, String> {
             paths.as_mut_ptr(),
             &raw mut num_mode_info_array_elements,
             modes.as_mut_ptr(),
-            None,
+            std::ptr::null_mut(),
         )
     };
 
-    if rc != ERROR_SUCCESS {
+    if rc.cast_unsigned() != ERROR_SUCCESS {
         return HashMap::new();
     }
 
@@ -91,7 +93,7 @@ pub fn discover_friendly_names() -> HashMap<String, String> {
         // the call fills the surrounding struct in place.
         let rc = unsafe { DisplayConfigGetDeviceInfo(&raw mut target.header) };
 
-        if WIN32_ERROR(rc.cast_unsigned()).is_ok() {
+        if WIN32_ERROR(rc.cast_unsigned()).is_err() {
             continue;
         }
 

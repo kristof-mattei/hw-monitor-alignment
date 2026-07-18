@@ -1,4 +1,4 @@
-use windows::Win32::Graphics::Gdi::{DEVMODE_DISPLAY_ORIENTATION, DMDO_90, DMDO_180, DMDO_270};
+use windows::wingdi::{DMDO_90, DMDO_180, DMDO_270};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
 pub enum Orientation {
@@ -11,7 +11,7 @@ pub enum Orientation {
 
 impl Orientation {
     /// Convert a Win32 `dmDisplayOrientation` (`DMDO_DEFAULT`/`DMDO_90`/`DMDO_180`/`DMDO_270`).
-    pub fn from_dmdo(value: DEVMODE_DISPLAY_ORIENTATION) -> Self {
+    pub fn from_dmdo(value: u32) -> Self {
         match value {
             DMDO_90 => Self::Portrait,
             DMDO_180 => Self::FlippedLandscape,
