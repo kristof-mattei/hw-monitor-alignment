@@ -4,14 +4,14 @@
 
 use std::rc::Rc;
 
-use windows::libloaderapi::GetModuleHandleW;
-use windows::minwindef::{LPARAM, LRESULT, WPARAM};
-use windows::windef::{HDC, HGDIOBJ, HWND, RECT};
-use windows::wingdi::{
+use windows::Win32::libloaderapi::GetModuleHandleW;
+use windows::Win32::minwindef::{LPARAM, LRESULT, WPARAM};
+use windows::Win32::windef::{HDC, HGDIOBJ, HWND, RECT};
+use windows::Win32::wingdi::{
     CreateSolidBrush, DEFAULT_GUI_FONT, DeleteObject, GetStockObject, SelectObject, SetBkMode,
     SetTextColor, TRANSPARENT,
 };
-use windows::winuser::{
+use windows::Win32::winuser::{
     BringWindowToTop, CREATESTRUCTW, CW_USEDEFAULT, CreateWindowExW, DT_RIGHT, DT_SINGLELINE,
     DT_TOP, DefWindowProcW, DestroyWindow, DrawTextW, FillRect, GWLP_USERDATA, GetWindowLongPtrW,
     InvalidateRect, SW_SHOW, SWP_NOZORDER, SetFocus, SetWindowLongPtrW, SetWindowPos, ShowWindow,

@@ -1,7 +1,7 @@
 use std::rc::Rc;
 use std::sync::{Arc, Mutex};
 
-use windows::windef::HWND;
+use windows::Win32::windef::HWND;
 
 use crate::monitor::Monitor;
 

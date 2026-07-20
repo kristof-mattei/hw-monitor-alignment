@@ -6,7 +6,7 @@
     reason = "names mirror the flat GDI+ API"
 )]
 
-use windows::windef::HDC;
+use windows::Win32::windef::HDC;
 
 /// GDI+ `GpStatus`: `Status(0)` (`Ok`) means success.
 #[repr(transparent)]

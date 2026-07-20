@@ -1,8 +1,8 @@
-use windows::wingdi::{
+use windows::Win32::wingdi::{
     DEVMODEW, DISPLAY_DEVICE_ATTACHED_TO_DESKTOP, DISPLAY_DEVICE_MIRRORING_DRIVER,
     DISPLAY_DEVICE_PRIMARY_DEVICE, DISPLAY_DEVICEW,
 };
-use windows::winuser::{
+use windows::Win32::winuser::{
     EDD_GET_DEVICE_INTERFACE_NAME, ENUM_REGISTRY_SETTINGS, EnumDisplayDevicesW,
     EnumDisplaySettingsW,
 };
