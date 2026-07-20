@@ -103,7 +103,7 @@ pub fn render(cx: &mut RenderCx, monitors: &Arc<[Monitor]>) -> impl Into<Element
                     // Re-read actual OS positions so the overview reflects the final state.
                     let fresh = discover::discover_monitors().into();
 
-                    // TODO assert fresh mathes our state
+                    // TODO assert fresh matches our state
 
                     set_display.call(fresh);
                 })
