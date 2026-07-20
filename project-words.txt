@@ -2,7 +2,6 @@ AARRGGBB
 adduser
 appgroup
 appuser
-argb
 ARGB
 bkeepers
 blit
@@ -10,7 +9,6 @@ borderless
 buildcache
 Cinstrument
 cleanp
-cleanup
 cocogitto
 CREATESTRUCTW
 Ctarget
@@ -19,7 +17,6 @@ DEVICEW
 devmode
 DEVMODEW
 DISPLAYCONFIG
-dmdo
 DMDO
 dorny
 endfor
@@ -29,11 +26,8 @@ errhandlingapi
 errorlens
 EXSTYLE
 FRAMECHANGED
-gdip
-Gdip
 GDIP
 gdiplus
-Gdiplus
 grcov
 GWLP
 hfont
@@ -48,15 +42,12 @@ initialised
 Inspectable
 INVALIDARG
 kristof
-Kristof
 libgit
 libloaderapi
 lldb
 lpfn
 lpsz
-matches
 mattei
-Mattei
 MAXIMIZEBOX
 minwindef
 monomorphization
@@ -78,15 +69,11 @@ pids
 postprocessors
 prereleased
 profraw
-retag
 Retag
-retagging
 Retagging
 rustflags
-RUSTFLAGS
 samply
 sccache
-SCCACHE
 skopeo
 smoothingmode
 SRCCOPY
@@ -108,8 +95,6 @@ usernamehw
 vadimcn
 viewbox
 vstack
-vtable
-Vtable
 VTABLE
 Vtbl
 windef
