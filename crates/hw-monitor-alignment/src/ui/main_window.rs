@@ -2,8 +2,8 @@ use std::rc::Rc;
 use std::sync::Arc;
 use std::time::Duration;
 
-use windows::windef::HWND;
-use windows::winuser::{GetActiveWindow, PostQuitMessage};
+use windows::Win32::windef::HWND;
+use windows::Win32::winuser::{GetActiveWindow, PostQuitMessage};
 use windows_reactor::{
     ContentDialog, DispatcherTimer, Element, ElementExt as _, GridLength, HorizontalAlignment,
     RenderCx, SetState, Thickness, VerticalAlignment, button, grid, hstack,
@@ -103,7 +103,7 @@ pub fn render(cx: &mut RenderCx, monitors: &Arc<[Monitor]>) -> impl Into<Element
                     // Re-read actual OS positions so the overview reflects the final state.
                     let fresh = discover::discover_monitors().into();
 
-                    // TODO assert fresh mathes our state
+                    // TODO assert fresh matches our state
 
                     set_display.call(fresh);
                 })

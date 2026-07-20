@@ -19,14 +19,14 @@ mod window;
 
 use std::sync::OnceLock;
 
-use windows::libloaderapi::GetModuleHandleW;
-use windows::minwindef::{LPARAM, WPARAM};
-use windows::windef::{COLORREF, HDC, HGDIOBJ, HICON, HWND};
-use windows::wingdi::{
+use windows::Win32::libloaderapi::GetModuleHandleW;
+use windows::Win32::minwindef::{LPARAM, WPARAM};
+use windows::Win32::windef::{COLORREF, HDC, HGDIOBJ, HICON, HWND};
+use windows::Win32::wingdi::{
     BitBlt, CreateCompatibleBitmap, CreateCompatibleDC, CreateSolidBrush, DeleteDC, DeleteObject,
     SRCCOPY, SelectObject,
 };
-use windows::winuser::{
+use windows::Win32::winuser::{
     BeginPaint, DestroyWindow, EndPaint, InvalidateRect, PAINTSTRUCT, PostMessageW,
     RegisterClassExW, SetFocus, WM_CLOSE, WNDCLASSEXW,
 };

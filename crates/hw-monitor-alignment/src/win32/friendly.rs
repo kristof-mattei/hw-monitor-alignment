@@ -9,13 +9,13 @@ use std::ffi::OsString;
 use std::os::windows::ffi::OsStringExt as _;
 
 use hashbrown::HashMap;
-use windows::winerror::ERROR_SUCCESS;
-use windows::wingdi::{
+use windows::Win32::winerror::ERROR_SUCCESS;
+use windows::Win32::wingdi::{
     DISPLAYCONFIG_DEVICE_INFO_GET_TARGET_NAME, DISPLAYCONFIG_DEVICE_INFO_HEADER,
     DISPLAYCONFIG_MODE_INFO, DISPLAYCONFIG_PATH_INFO, DISPLAYCONFIG_TARGET_DEVICE_NAME,
     QDC_ONLY_ACTIVE_PATHS,
 };
-use windows::winuser::{
+use windows::Win32::winuser::{
     DisplayConfigGetDeviceInfo, GetDisplayConfigBufferSizes, QueryDisplayConfig,
 };
 use windows_core::WIN32_ERROR;
