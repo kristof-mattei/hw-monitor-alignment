@@ -1,7 +1,7 @@
-use windows::errhandlingapi::SetLastError;
-use windows::windef::{HWND, RECT};
-use windows::winerror::E_INVALIDARG;
-use windows::winuser::{
+use windows::Win32::errhandlingapi::SetLastError;
+use windows::Win32::windef::{HWND, RECT};
+use windows::Win32::winerror::E_INVALIDARG;
+use windows::Win32::winuser::{
     AdjustWindowRectExForDpi, GWL_EXSTYLE, GWL_STYLE, GetDpiForSystem, GetDpiForWindow,
     GetWindowLongPtrW, GetWindowRect, SWP_FRAMECHANGED, SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE,
     SWP_NOZORDER, SetWindowLongPtrW, SetWindowPos, USER_DEFAULT_SCREEN_DPI, WS_MAXIMIZEBOX,

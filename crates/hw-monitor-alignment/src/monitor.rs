@@ -1,4 +1,4 @@
-use windows::wingdi::{DMDO_90, DMDO_180, DMDO_270};
+use windows::Win32::wingdi::{DMDO_90, DMDO_180, DMDO_270};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
 pub enum Orientation {

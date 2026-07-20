@@ -2,8 +2,8 @@ use std::rc::Rc;
 use std::sync::Arc;
 use std::time::Duration;
 
-use windows::windef::HWND;
-use windows::winuser::{GetActiveWindow, PostQuitMessage};
+use windows::Win32::windef::HWND;
+use windows::Win32::winuser::{GetActiveWindow, PostQuitMessage};
 use windows_reactor::{
     ContentDialog, DispatcherTimer, Element, ElementExt as _, GridLength, HorizontalAlignment,
     RenderCx, SetState, Thickness, VerticalAlignment, button, grid, hstack,
