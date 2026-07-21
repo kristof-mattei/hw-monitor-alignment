@@ -17,7 +17,7 @@ default = []
 
 [dependencies]
 hashbrown = "=0.17.1"
-windows = { git = "https://github.com/microsoft/windows-rs", rev = "deef43f6c2a2b71288838e16196138dc032e928d", features = [
+windows = { git = "https://github.com/microsoft/windows-rs", rev = "36cea59bc35b85e0a14b067fb11cc496e3633c58", features = [
     "errhandlingapi",
     "libloaderapi",
     "minwindef",
@@ -26,13 +26,13 @@ windows = { git = "https://github.com/microsoft/windows-rs", rev = "deef43f6c2a2
     "wingdi",
     "winuser",
 ] }
-windows-core = { git = "https://github.com/microsoft/windows-rs", rev = "deef43f6c2a2b71288838e16196138dc032e928d" }
-windows-reactor = { git = "https://github.com/microsoft/windows-rs", rev = "deef43f6c2a2b71288838e16196138dc032e928d" }
+windows-core = { git = "https://github.com/microsoft/windows-rs", rev = "36cea59bc35b85e0a14b067fb11cc496e3633c58" }
+windows-reactor = { git = "https://github.com/microsoft/windows-rs", rev = "36cea59bc35b85e0a14b067fb11cc496e3633c58" }
 
 [build-dependencies]
-windows-bindgen = { git = "https://github.com/microsoft/windows-rs", rev = "deef43f6c2a2b71288838e16196138dc032e928d" }
-windows-rdl = { git = "https://github.com/microsoft/windows-rs", rev = "deef43f6c2a2b71288838e16196138dc032e928d" }
-windows-reactor-setup = { git = "https://github.com/microsoft/windows-rs", rev = "deef43f6c2a2b71288838e16196138dc032e928d" }
+windows-bindgen = { git = "https://github.com/microsoft/windows-rs", rev = "36cea59bc35b85e0a14b067fb11cc496e3633c58" }
+windows-rdl = { git = "https://github.com/microsoft/windows-rs", rev = "36cea59bc35b85e0a14b067fb11cc496e3633c58" }
+windows-reactor-setup = { git = "https://github.com/microsoft/windows-rs", rev = "36cea59bc35b85e0a14b067fb11cc496e3633c58" }
 
 [dev-dependencies]
 pretty_assertions = "=1.4.1"
