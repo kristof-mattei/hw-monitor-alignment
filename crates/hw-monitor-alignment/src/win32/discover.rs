@@ -51,7 +51,7 @@ pub fn discover_monitors() -> Vec<Monitor> {
                     PCWSTR::from_raw(dd.DeviceName.as_ptr()),
                     device_monitor,
                     &raw mut ddm,
-                    EDD_GET_DEVICE_INTERFACE_NAME,
+                    EDD_GET_DEVICE_INTERFACE_NAME.cast_unsigned(),
                 )
             }
             .as_bool();
@@ -60,8 +60,10 @@ pub fn discover_monitors() -> Vec<Monitor> {
                 break;
             }
 
-            let is_attached = (ddm.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP) != 0;
-            let is_mirroring = (ddm.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER) != 0;
+            let is_attached =
+                (ddm.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP.cast_unsigned()) != 0;
+            let is_mirroring =
+                (ddm.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER.cast_unsigned()) != 0;
 
             if is_attached && !is_mirroring {
                 let mut devmode = DEVMODEW {
@@ -101,8 +103,11 @@ pub fn discover_monitors() -> Vec<Monitor> {
                         height: devmode.dmPelsHeight,
                         x: pos.x,
                         y: pos.y,
-                        orientation: Orientation::from_dmdo(display.dmDisplayOrientation),
-                        primary: (dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE) != 0,
+                        orientation: Orientation::from_dmdo(
+                            display.dmDisplayOrientation.cast_signed(),
+                        ),
+                        primary: (dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE.cast_unsigned())
+                            != 0,
                     });
                 }
             }

@@ -105,7 +105,7 @@ fn stop_all(session: &SharedSession) {
     for val in hwnds {
         // SAFETY: PostMessageW is safe even if the window was already destroyed.
         unsafe {
-            PostMessageW(Some(val), WM_CLOSE, WPARAM(0), LPARAM(0));
+            PostMessageW(Some(val), WM_CLOSE.cast_unsigned(), WPARAM(0), LPARAM(0));
         }
     }
 }

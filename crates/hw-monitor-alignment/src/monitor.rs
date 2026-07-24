@@ -11,7 +11,7 @@ pub enum Orientation {
 
 impl Orientation {
     /// Convert a Win32 `dmDisplayOrientation` (`DMDO_DEFAULT`/`DMDO_90`/`DMDO_180`/`DMDO_270`).
-    pub fn from_dmdo(value: u32) -> Self {
+    pub fn from_dmdo(value: i32) -> Self {
         match value {
             DMDO_90 => Self::Portrait,
             DMDO_180 => Self::FlippedLandscape,

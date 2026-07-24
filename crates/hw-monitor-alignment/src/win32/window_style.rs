@@ -27,9 +27,8 @@ pub fn make_fixed(hwnd: HWND) -> Result<(), windows_reactor::Error> {
     }
 
     // drop `WS_THICKFRAME` and `WS_MAXIMIZEBOX` so it can't be resized and shows no resize cursor on its edges.
-    let fixed: u32 = u32::try_from(style)
-        .expect("GetWindowLongPtrW(hwnd, GWL_STYLE) returns a window style")
-        & !(WS_THICKFRAME | WS_MAXIMIZEBOX);
+    // note the as cast because style is sign-extended, which makes it out of bounds for i32. we only care about the lower 32-bits.
+    let fixed: i32 = style as i32 & !(WS_THICKFRAME | WS_MAXIMIZEBOX);
 
     // SAFETY: unset the errors so we can properly inspect return values
     unsafe {
@@ -56,7 +55,8 @@ pub fn make_fixed(hwnd: HWND) -> Result<(), windows_reactor::Error> {
             0,
             0,
             0,
-            SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED,
+            (SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED)
+                .cast_unsigned(),
         )
     }
     .ok()?;
@@ -79,7 +79,7 @@ fn get_dpi(hwnd: HWND) -> u32 {
         return system_dpi;
     }
 
-    USER_DEFAULT_SCREEN_DPI
+    USER_DEFAULT_SCREEN_DPI.cast_unsigned()
 }
 
 /// Resize `hwnd` to the given client **width** `w` (logical/DIP units), keeping
@@ -173,7 +173,7 @@ pub unsafe fn resize(hwnd: HWND, w: f64, _h: f64) -> Result<(), windows_core::Er
             new_y,
             new_width,
             current_height,
-            SWP_NOZORDER | SWP_NOACTIVATE,
+            (SWP_NOZORDER | SWP_NOACTIVATE).cast_unsigned(),
         )
     }
     .ok()

@@ -60,7 +60,7 @@ fn move_monitor(data: &OverlayData, delta: i32) {
     invalidate_all(&data.session);
 }
 
-fn handle_key(data: &mut OverlayData, hwnd: HWND, vk: u32) {
+fn handle_key(data: &mut OverlayData, hwnd: HWND, vk: i32) {
     if vk == VK_ESCAPE {
         stop_all(&data.session);
     } else if vk == VK_UP {
@@ -248,11 +248,11 @@ fn paint(hdc: HDC, data: &OverlayData) {
             let wide: Vec<u16> = text.encode_utf16().collect();
 
             // stock objects don't need to be deleted
-            let hfont = GetStockObject(DEFAULT_GUI_FONT.cast_signed());
+            let hfont = GetStockObject(DEFAULT_GUI_FONT);
 
             let old_font = SelectObject(hdc, hfont);
 
-            SetBkMode(hdc, TRANSPARENT.cast_signed());
+            SetBkMode(hdc, TRANSPARENT);
             SetTextColor(hdc, rgb(60, 60, 60));
 
             let mut rc = RECT {
@@ -267,7 +267,7 @@ fn paint(hdc: HDC, data: &OverlayData) {
                 PCWSTR::from_raw(wide.as_ptr()),
                 i32::try_from(wide.len()).expect("cursor text length fits i32"),
                 &raw mut rc,
-                DT_RIGHT | DT_TOP | DT_SINGLELINE,
+                (DT_RIGHT | DT_TOP | DT_SINGLELINE).cast_unsigned(),
             );
 
             SelectObject(hdc, old_font);
@@ -281,13 +281,15 @@ pub(super) unsafe extern "system" fn overlay_wndproc(
     wparam: WPARAM,
     lparam: LPARAM,
 ) -> LRESULT {
+    let msg = msg.cast_signed();
+
     match msg {
         WM_NCCREATE => {
             let cs = &*(lparam.0 as *const CREATESTRUCTW);
 
             SetWindowLongPtrW(hwnd, GWLP_USERDATA, cs.lpCreateParams as isize);
 
-            DefWindowProcW(hwnd, msg, wparam, lparam)
+            DefWindowProcW(hwnd, msg.cast_unsigned(), wparam, lparam)
         },
 
         WM_ERASEBKGND => LRESULT(1), // the double-buffered WM_PAINT repaints fully, so skip the erase flash here
@@ -296,7 +298,7 @@ pub(super) unsafe extern "system" fn overlay_wndproc(
             let pointer = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *const OverlayData;
 
             if pointer.is_null() {
-                return DefWindowProcW(hwnd, msg, wparam, lparam);
+                return DefWindowProcW(hwnd, msg.cast_unsigned(), wparam, lparam);
             }
 
             let data = &*pointer;
@@ -313,11 +315,7 @@ pub(super) unsafe extern "system" fn overlay_wndproc(
                 return LRESULT(0);
             }
 
-            handle_key(
-                &mut *pointer,
-                hwnd,
-                u32::try_from(wparam.0 & 0xFFFF).expect("masked to 16 bits"),
-            );
+            handle_key(&mut *pointer, hwnd, i32::from(wparam.0 as u16));
 
             LRESULT(0)
         },
@@ -368,7 +366,7 @@ pub(super) unsafe extern "system" fn overlay_wndproc(
             LRESULT(0)
         },
 
-        _ => DefWindowProcW(hwnd, msg, wparam, lparam),
+        _ => DefWindowProcW(hwnd, msg.cast_unsigned(), wparam, lparam),
     }
 }
 
@@ -399,7 +397,7 @@ pub(super) fn create_overlay_window(
     // SAFETY: api call
     let overlay = unsafe {
         CreateWindowExW(
-            WS_EX_TOPMOST | WS_EX_TOOLWINDOW,
+            (WS_EX_TOPMOST | WS_EX_TOOLWINDOW).cast_unsigned(),
             PCWSTR::from_raw(class_wide.as_ptr()),
             PCWSTR::from_raw(title_wide.as_ptr()),
             WS_POPUP,
@@ -420,8 +418,16 @@ pub(super) fn create_overlay_window(
 
     // SAFETY: reposition the overlay to the monitor's virtual-screen coordinates, then show.
     unsafe {
-        SetWindowPos(overlay, None, monitor.x, monitor.y, mw, mh, SWP_NOZORDER);
-        ShowWindow(overlay, SW_SHOW.cast_signed());
+        SetWindowPos(
+            overlay,
+            None,
+            monitor.x,
+            monitor.y,
+            mw,
+            mh,
+            SWP_NOZORDER.cast_unsigned(),
+        );
+        ShowWindow(overlay, SW_SHOW);
         BringWindowToTop(overlay);
     }
 
