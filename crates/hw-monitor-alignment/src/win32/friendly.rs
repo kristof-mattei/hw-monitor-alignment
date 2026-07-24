@@ -44,13 +44,13 @@ pub fn discover_friendly_names() -> HashMap<String, String> {
     // SAFETY: Win32 API call
     let rc = unsafe {
         GetDisplayConfigBufferSizes(
-            QDC_ONLY_ACTIVE_PATHS,
+            QDC_ONLY_ACTIVE_PATHS.cast_unsigned(),
             &raw mut num_path_array_elements,
             &raw mut num_mode_info_array_elements,
         )
     };
 
-    if rc.cast_unsigned() != ERROR_SUCCESS || num_path_array_elements == 0 {
+    if rc != ERROR_SUCCESS || num_path_array_elements == 0 {
         return HashMap::new();
     }
 
@@ -63,7 +63,7 @@ pub fn discover_friendly_names() -> HashMap<String, String> {
     // SAFETY: arrays are sized per `GetDisplayConfigBufferSizes`.
     let rc = unsafe {
         QueryDisplayConfig(
-            QDC_ONLY_ACTIVE_PATHS,
+            QDC_ONLY_ACTIVE_PATHS.cast_unsigned(),
             &raw mut num_path_array_elements,
             paths.as_mut_ptr(),
             &raw mut num_mode_info_array_elements,
@@ -72,7 +72,7 @@ pub fn discover_friendly_names() -> HashMap<String, String> {
         )
     };
 
-    if rc.cast_unsigned() != ERROR_SUCCESS {
+    if rc != ERROR_SUCCESS {
         return HashMap::new();
     }
 
