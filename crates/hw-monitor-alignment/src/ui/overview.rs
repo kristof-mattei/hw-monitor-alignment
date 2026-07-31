@@ -12,11 +12,12 @@ const MONITOR_BORDER_WIDTH: f64 = 20.0;
 ///
 /// E.g. `"\\.\DISPLAY1" -> "1"`.
 fn index_from_device_name(device_name: &str) -> &str {
-    let ummm = "?";
+    // TODO: decide whether this should actually blow up the application
+    let invalid_display_name = "?";
 
     match device_name.strip_prefix("\\\\.\\DISPLAY") {
         Some(stripped) => stripped,
-        None => ummm,
+        None => invalid_display_name,
     }
 }
 

@@ -175,7 +175,7 @@ fn ensure_class_registered() -> bool {
             hIconSm: HICON::default(),
         };
 
-        // SAFETY: wc is fully initialised.
+        // SAFETY: wc is fully initialized.
         unsafe { RegisterClassExW(&raw const wc) }.0 != 0
     })
 }

@@ -28,7 +28,7 @@ pub fn discover_monitors() -> Vec<Monitor> {
             ..DISPLAY_DEVICEW::default()
         };
 
-        // SAFETY: dd is initialised above and lives for the call duration.
+        // SAFETY: dd is initialized above and lives for the call duration.
         let found_display_adaptor =
             unsafe { EnumDisplayDevicesW(PCWSTR::null(), i_dev, &raw mut dd, 0) }.as_bool();
 

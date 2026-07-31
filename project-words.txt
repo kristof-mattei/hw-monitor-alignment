@@ -38,7 +38,6 @@ HSTRING
 hubot
 hwnds
 idents
-initialised
 Inspectable
 INVALIDARG
 kristof
@@ -86,7 +85,6 @@ THICKFRAME
 TOOLWINDOW
 topo
 trixie
-ummm
 uninlined
 unseparated
 USEDEFAULT
