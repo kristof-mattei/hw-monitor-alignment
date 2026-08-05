@@ -7,11 +7,12 @@ bkeepers
 blit
 borderless
 buildcache
-Cinstrument
+cinstrument
 cleanp
 cocogitto
 CREATESTRUCTW
-Ctarget
+ctarget
+cttc
 cves
 DEVICEW
 devmode
@@ -48,6 +49,7 @@ lpfn
 lpsz
 mattei
 MAXIMIZEBOX
+mimalloc
 minwindef
 monomorphization
 MOUSEMOVE
@@ -67,8 +69,9 @@ Pels
 postprocessors
 prereleased
 profraw
-Retag
-Retagging
+pyflakes
+retag
+retagging
 rustflags
 samply
 sccache
@@ -78,9 +81,9 @@ SRCCOPY
 startswith
 striptags
 taiki
-TARGETPLATFORMDASH
+targetplatformdash
 telem
-Tera
+tera
 THICKFRAME
 TOOLWINDOW
 topo
