@@ -1,6 +1,7 @@
 use windows_reactor::{
-    Canvas, Color, Element, ElementExt as _, HorizontalAlignment, Shape, Stretch,
-    VerticalAlignment, grid, text_block, viewbox,
+    BackgroundExt as _, Canvas, CanvasChildExt as _, Color, Element, HorizontalAlignment,
+    LayoutExt as _, Shape, Stretch, TextStyleExt as _, VerticalAlignment, Viewbox, grid,
+    text_block, viewbox,
 };
 
 use crate::monitor::Monitor;
@@ -24,11 +25,9 @@ fn index_from_device_name(device_name: &str) -> &str {
 /// The virtual-screen overview.
 ///
 /// Monitors are authored at their real pixel geometry and position, and then scaled by a [`ViewBox`].
-pub fn overview_canvas(monitors: &[Monitor]) -> Element {
+pub fn overview_canvas(monitors: &[Monitor]) -> Viewbox {
     let &[ref first, ref rest @ ..] = monitors else {
-        return Canvas::new(std::iter::empty::<Element>())
-            .background(Color::rgb(100, 100, 100))
-            .into();
+        return viewbox(Canvas::new(()).background(Color::rgb(100, 100, 100)));
     };
 
     let (min_x, min_y, max_x, max_y) = rest.iter().fold(
@@ -53,9 +52,7 @@ pub fn overview_canvas(monitors: &[Monitor]) -> Element {
 
     // fake monitors?
     if total_width == 0.0 || total_height == 0.0 {
-        return Canvas::new(std::iter::empty::<Element>())
-            .background(Color::rgb(100, 100, 100))
-            .into();
+        return viewbox(Canvas::new(()).background(Color::rgb(100, 100, 100)));
     }
 
     let mut children: Vec<Element> = Vec::with_capacity(monitors.len() * 2);
@@ -115,5 +112,4 @@ pub fn overview_canvas(monitors: &[Monitor]) -> Element {
     viewbox(scene)
         .stretch(Stretch::Uniform)
         .horizontal_alignment(HorizontalAlignment::Center)
-        .into()
 }
