@@ -18,7 +18,6 @@ use windows::Win32::wingdi::{
 use windows::Win32::winuser::{
     DisplayConfigGetDeviceInfo, GetDisplayConfigBufferSizes, QueryDisplayConfig,
 };
-use windows_core::WIN32_ERROR;
 
 fn trim(mut wide: &[u16]) -> &[u16] {
     while wide.last() == Some(&0) {
@@ -93,7 +92,7 @@ pub fn discover_friendly_names() -> HashMap<String, String> {
         // the call fills the surrounding struct in place.
         let rc = unsafe { DisplayConfigGetDeviceInfo(&raw mut target.header) };
 
-        if WIN32_ERROR(rc.cast_unsigned()).is_err() {
+        if rc != ERROR_SUCCESS {
             continue;
         }
 
