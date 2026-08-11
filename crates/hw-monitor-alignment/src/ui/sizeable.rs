@@ -1,12 +1,9 @@
 use std::rc::Rc;
 
-use windows_core::Interface as _;
 use windows_reactor::{
-    Backend, ControlId, ControlKind, CustomElement, CustomElementHandle, Element, Grid, GridLength,
-    HorizontalAlignment, Prop, PropValue, VerticalAlignment, grid,
+    Element, Grid, GridLength, HorizontalAlignment, LayoutExt as _, VerticalAlignment,
+    composition_host, grid,
 };
-
-use crate::bindings::IFrameworkElement;
 
 /// Wraps `child` so its rendered size is reported through `on_resize`.
 pub struct Sizeable {
@@ -29,16 +26,22 @@ impl Sizeable {
 
     /// The concrete wrapper grid, so callers can apply layout modifiers.
     pub fn into_grid(self) -> Grid {
-        let probe: Element = SizeProbe {
-            on_resize: self.on_resize,
+        // An empty composition host is an invisible native grid; stretched to fill
+        // the cell, its SizeChanged reports the cell size, which equals the
+        // child's rendered size.
+        let mut probe = composition_host()
+            .horizontal_alignment(HorizontalAlignment::Stretch)
+            .vertical_alignment(VerticalAlignment::Stretch);
+
+        if let Some(on_resize) = self.on_resize {
+            probe = probe.on_resize(move |w, h| on_resize(w, h));
         }
-        .into();
 
         // Both children share the grid's single cell (row/col 0):
         // the child renders, the probe overlays it and measures the same area.
         // column by default is Star, we want Auto
         // Star is 'take remaining space', Auto is size to child
-        grid([self.child, probe])
+        grid([self.child, probe.into()])
             .columns([GridLength::Auto])
             .rows([GridLength::Auto])
     }
@@ -51,97 +54,5 @@ pub fn sizeable<I: Into<Element>>(child: I) -> Sizeable {
 impl From<Sizeable> for Element {
     fn from(value: Sizeable) -> Self {
         value.into_grid().into()
-    }
-}
-
-/// Invisible control.
-///
-/// Initially I tried to use this control to also render contents, but we cannot. Seems like `CustomElement`s can only do native rendering.
-///
-/// We use the `CustomElement` trait like this to get access to the native `FrameworkElement` whose `SizeChanged` event we subscribe to.
-struct SizeProbe {
-    on_resize: Option<Rc<dyn Fn(f64, f64)>>,
-}
-
-impl From<SizeProbe> for Element {
-    fn from(value: SizeProbe) -> Self {
-        Element::Custom(CustomElementHandle(Box::new(value)))
-    }
-}
-
-impl CustomElement for SizeProbe {
-    fn as_any(&self) -> &dyn std::any::Any {
-        self
-    }
-
-    fn kind_name(&self) -> &'static str {
-        "SizeProbe"
-    }
-
-    fn eq_dyn(&self, other: &dyn CustomElement) -> bool {
-        // Callbacks aren't comparable. We're making two probes to be treated as equal, for as long as they have a callback.
-        // This is probably incorrect, but I cannot think of a better way right now. We cannot get a pointer to the underlying
-        // function because it might be a closure on the stack.
-
-        if let Some(other) = other.as_any().downcast_ref::<SizeProbe>() {
-            match (&self.on_resize, &other.on_resize) {
-                (&None, &None) | (&Some(_), &Some(_)) => true,
-                (&None, &Some(_)) | (&Some(_), &None) => false,
-            }
-        } else {
-            false
-        }
-    }
-
-    fn clone_dyn(&self) -> Box<dyn CustomElement> {
-        Box::new(SizeProbe {
-            on_resize: self.on_resize.clone(),
-        })
-    }
-
-    fn mount(&self, backend: &mut dyn Backend) -> ControlId {
-        // report as a border
-        let id = backend.create(ControlKind::Border);
-
-        // Stretch to fill the grid cell so SizeChanged reports the cell size, which equals the child's rendered size.
-        backend.set_prop(
-            id,
-            Prop::HorizontalAlignment,
-            &PropValue::I32(HorizontalAlignment::Stretch.0),
-        );
-        backend.set_prop(
-            id,
-            Prop::VerticalAlignment,
-            &PropValue::I32(VerticalAlignment::Stretch.0),
-        );
-
-        if let Some(on_resize) = self.on_resize.clone()
-            && let Some(native) = backend.get_native_element(id)
-            && let Ok(fe) = native.cast::<IFrameworkElement>()
-        {
-            let size_revoker = fe.SizeChanged(move |_sender, args| {
-                if let Some(args) = args.as_ref()
-                    && let Ok(s) = args.NewSize()
-                {
-                    on_resize(f64::from(s.width), f64::from(s.height));
-                }
-            });
-
-            // Leak the revoker so the subscription lives for the control's lifetime.
-            // This mirrors the framework's SwapChainPanel::on_resize).
-            if let Ok(size_revoker) = size_revoker {
-                #[expect(
-                    clippy::mem_forget,
-                    reason = "subscription must outlive this scope, mirrors framework"
-                )]
-                std::mem::forget(size_revoker);
-            }
-        }
-
-        id
-    }
-
-    fn update(&self, _prev: &dyn CustomElement, _id: ControlId, _backend: &mut dyn Backend) {
-        // Stateless control: the SizeChanged subscription persists for the control's lifetime, so there is nothing to diff.
     }
 }
