@@ -1,5 +1,4 @@
 aarrggbb
-adduser
 appgroup
 appuser
 argb
@@ -57,7 +56,6 @@ noactivate
 nomove
 nosize
 nozorder
-nvmrc
 paintstruct
 pathbuf
 pcwstr
@@ -68,6 +66,7 @@ profraw
 pyflakes
 retag
 retagging
+rhysd
 rustflags
 samply
 sccache
