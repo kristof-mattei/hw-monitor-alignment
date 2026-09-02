@@ -9,6 +9,7 @@ borderless
 buildcache
 cinstrument
 cleanp
+cliffignore
 createstructw
 ctarget
 cves
@@ -40,7 +41,6 @@ invalidarg
 kristof
 libgit
 libloaderapi
-lldb
 lpfn
 lpsz
 mattei
@@ -49,7 +49,6 @@ minwindef
 monomorphization
 mousemove
 multiplatform
-mypy
 nccreate
 nextest
 noactivate
@@ -64,6 +63,7 @@ postprocessors
 prereleased
 profraw
 pyflakes
+rawfile
 retag
 retagging
 rhysd
@@ -72,6 +72,7 @@ samply
 sccache
 skopeo
 skopeo's
+slurpfile
 smoothingmode
 srccopy
 startswith
