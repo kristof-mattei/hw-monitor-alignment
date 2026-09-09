@@ -55,6 +55,7 @@ noactivate
 nomove
 nosize
 nozorder
+oras
 paintstruct
 pathbuf
 pcwstr
