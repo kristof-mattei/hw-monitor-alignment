@@ -41,6 +41,7 @@ invalidarg
 kristof
 libgit
 libloaderapi
+lintian
 lpfn
 lpsz
 mattei
