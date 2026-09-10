@@ -9,23 +9,16 @@
 
 use std::sync::Arc;
 
-use windows_reactor::{App, Result, bootstrap};
+use windows_core::Result;
+use windows_reactor::App;
 
 mod monitor;
 mod state;
 mod ui;
 mod win32;
 
-const WINDOW_TITLE: &str = "HwMonitorAlignment";
-
 fn main() -> Result<()> {
-    // ensure we have the WinUI3 package.
-    bootstrap()?;
-
     let monitors: Arc<[monitor::Monitor]> = win32::discover::discover_monitors().into();
 
-    App::new()
-        .title(WINDOW_TITLE)
-        .inner_size(570.0, 900.0)
-        .render(move |cx| ui::main_window::render(cx, &monitors).into())
+    App::run_component::<ui::main_window::MainWindow>(monitors)
 }
