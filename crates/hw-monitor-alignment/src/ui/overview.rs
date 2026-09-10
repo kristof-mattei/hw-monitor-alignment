@@ -1,7 +1,6 @@
 use windows_reactor::{
-    BackgroundExt as _, Canvas, CanvasChildExt as _, Color, Element, HorizontalAlignment,
-    LayoutExt as _, Shape, Stretch, TextStyleExt as _, VerticalAlignment, Viewbox, grid,
-    text_block, viewbox,
+    Canvas, CanvasChildExt as _, ChildrenControl as _, Color, Grid, HorizontalAlignment, KeyedView,
+    LayoutControl as _, Rectangle, Stretch, TextBlock, VerticalAlignment, Viewbox,
 };
 
 use crate::monitor::Monitor;
@@ -22,12 +21,17 @@ fn index_from_device_name(device_name: &str) -> &str {
     }
 }
 
+fn empty_scene() -> Viewbox {
+    // `Canvas` has no background
+    Viewbox::new().child(Grid::new().background(Color::rgb(100, 100, 100)))
+}
+
 /// The virtual-screen overview.
 ///
-/// Monitors are authored at their real pixel geometry and position, and then scaled by a [`ViewBox`].
+/// Monitors are authored at their real pixel geometry and position, and then scaled by a [`Viewbox`].
 pub fn overview_canvas(monitors: &[Monitor]) -> Viewbox {
     let &[ref first, ref rest @ ..] = monitors else {
-        return viewbox(Canvas::new(()).background(Color::rgb(100, 100, 100)));
+        return empty_scene();
     };
 
     let (min_x, min_y, max_x, max_y) = rest.iter().fold(
@@ -52,10 +56,10 @@ pub fn overview_canvas(monitors: &[Monitor]) -> Viewbox {
 
     // fake monitors?
     if total_width == 0.0 || total_height == 0.0 {
-        return viewbox(Canvas::new(()).background(Color::rgb(100, 100, 100)));
+        return empty_scene();
     }
 
-    let mut children: Vec<Element> = Vec::with_capacity(monitors.len() * 2);
+    let mut children: Vec<KeyedView> = Vec::with_capacity(monitors.len() * 2);
 
     for monitor in monitors {
         // normalize the positions in a (0, 0) -> (total_width, total_height) plane
@@ -73,7 +77,7 @@ pub fn overview_canvas(monitors: &[Monitor]) -> Viewbox {
             Color::rgb(130, 130, 140)
         };
 
-        let monitor_rectangle = Shape::rectangle()
+        let monitor_rectangle = Rectangle::new()
             .fill(fill)
             .stroke(Color::rgb(235, 235, 235))
             .stroke_thickness(MONITOR_BORDER_WIDTH)
@@ -82,7 +86,10 @@ pub fn overview_canvas(monitors: &[Monitor]) -> Viewbox {
             .canvas_left(x_offset)
             .canvas_top(y_offset);
 
-        children.push(monitor_rectangle.into());
+        children.push(KeyedView::new(
+            format!("rectangle {}", monitor.device_name),
+            monitor_rectangle,
+        ));
 
         // in the same position as the monitor rectangle we draw a grid
         // in the grid a textbox (auto centered because of the grid)
@@ -91,25 +98,32 @@ pub fn overview_canvas(monitors: &[Monitor]) -> Viewbox {
 
         let font_size = height * 0.5;
 
-        let number = grid([text_block(label)
-            .font_size(font_size)
-            .foreground(Color::rgb(245, 245, 245))
-            .horizontal_alignment(HorizontalAlignment::Center)
-            .vertical_alignment(VerticalAlignment::Center)])
-        .width(width)
-        .height(height)
-        .canvas_left(x_offset)
-        .canvas_top(y_offset);
+        let number = Grid::new()
+            .width(width)
+            .height(height)
+            .canvas_left(x_offset)
+            .canvas_top(y_offset)
+            .children([TextBlock::new()
+                .text(label)
+                .font_size(font_size)
+                .foreground(Color::rgb(245, 245, 245))
+                .horizontal_alignment(HorizontalAlignment::Center)
+                .vertical_alignment(VerticalAlignment::Center)]);
 
-        children.push(number.into());
+        children.push(KeyedView::new(
+            format!("label {}", monitor.device_name),
+            number,
+        ));
     }
 
-    let scene = Canvas::new(children)
+    let scene = Canvas::new()
         .width(total_width)
-        .height(total_height);
+        .height(total_height)
+        .keyed_children(children);
 
     // the viewbox makes it so that the contents (the canvas) are scaled to the maximum boundaries
-    viewbox(scene)
+    Viewbox::new()
         .stretch(Stretch::Uniform)
         .horizontal_alignment(HorizontalAlignment::Center)
+        .child(scene)
 }

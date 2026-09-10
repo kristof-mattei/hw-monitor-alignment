@@ -1,12 +1,14 @@
 use std::rc::Rc;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
 
 use windows::Win32::windef::HWND;
-use windows::Win32::winuser::{GetActiveWindow, PostQuitMessage};
+use windows::Win32::winuser::GetActiveWindow;
 use windows_reactor::{
-    ContentDialog, DispatcherTimer, Element, GridChildExt as _, GridLength, HorizontalAlignment,
-    LayoutExt as _, RenderCx, SetState, Thickness, VerticalAlignment, button, grid, hstack,
+    Button, ChildrenControl as _, Component, ComponentContext, ComponentTimer,
+    CompositionHostEvent, ContentControl as _, ContentDialog, ElementRef, Grid, GridChildExt as _,
+    GridLength, HorizontalAlignment, LayoutControl as _, Orientation, StackPanel, Thickness,
+    VerticalAlignment, View, ViewContext, WindowVisuals,
 };
 
 use super::info_panel::info_panel;
@@ -15,8 +17,11 @@ use crate::state::{AdjustSession, SharedSession};
 use crate::ui::overview::overview_canvas;
 use crate::win32::{discover, overlay, window_style};
 
+const WINDOW_TITLE: &str = "HwMonitorAlignment";
+
+const POLL_INTERVAL: Duration = Duration::from_millis(100);
+
 fn on_resize(w: f64, h: f64) {
-    // Once the UI mounts and the window is active, grab the HWND
     // SAFETY: failure mode is returning an `HWND` where `.is_invalid()` returns `true`.
     let hwnd: HWND = unsafe { GetActiveWindow() };
 
@@ -28,141 +33,206 @@ fn on_resize(w: f64, h: f64) {
     }
 }
 
-pub fn render(cx: &mut RenderCx, monitors: &Arc<[Monitor]>) -> impl Into<Element> {
-    let (adjusting, set_adjusting) = cx.use_state(false);
+#[derive(Clone)]
+pub enum Message {
+    ToggleAdjusting,
+    ShowAbout(bool),
+    Poll,
+    Close,
+}
 
-    let (display_monitors, set_display_monitors) = cx.use_state(Arc::clone(monitors));
-    let (show_about, set_show_about) = cx.use_state(false);
+/// A running alignment session; dropping it cancels the poll, queued `Poll` included.
+struct Adjusting {
+    session: SharedSession,
+    timer: ComponentTimer,
+    /// The `AdjustSession::version` the overview was last built from.
+    last_version: u64,
+}
 
-    cx.use_effect((), || {
-        // Once the UI mounts and the window is active, grab the HWND
-        // SAFETY: failure mode is returning `NULL`
-        let hwnd: HWND = unsafe { GetActiveWindow() };
+pub struct MainWindow {
+    /// The monitor list as discovered at startup.
+    monitors: Arc<[Monitor]>,
+    /// What the UI draws: `monitors`, or the working positions of the running session.
+    display_monitors: Arc<[Monitor]>,
+    adjusting: Option<Adjusting>,
+    show_about: bool,
+    /// Measures the info panel so the window can be resized to fit it.
+    panel_probe: ElementRef<Grid>,
+}
 
-        if !hwnd.0.is_null() {
-            window_style::make_fixed(hwnd).expect("Failed to make window fixed");
-        }
-    });
+/// `set_timeout` is one-shot; each `Poll` schedules the next.
+fn schedule_poll(context: &ComponentContext<MainWindow>) -> ComponentTimer {
+    context
+        .set_timeout(POLL_INTERVAL, Message::Poll)
+        .expect("Could not schedule the session poll")
+}
 
-    {
-        let monitors = Arc::clone(monitors);
-        let set_adjusting = SetState::clone(&set_adjusting);
+impl MainWindow {
+    fn start_adjusting(&mut self, context: &ComponentContext<Self>) {
+        let session: SharedSession =
+            Rc::new(Mutex::new(AdjustSession::new(Arc::clone(&self.monitors))));
 
-        cx.use_effect_with_cleanup(adjusting, move || {
-            if !adjusting {
-                return None::<Box<dyn FnOnce()>>;
-            }
+        overlay::create_overlays(&session);
 
-            let session: SharedSession = Rc::new(std::sync::Mutex::new(AdjustSession::new(
-                Arc::clone(&monitors),
-            )));
-
-            overlay::create_overlays(&session);
-
-            let last_version = std::cell::Cell::new(0_u64);
-
-            let timer = {
-                let session = Rc::clone(&session);
-                let set_display_monitors = SetState::clone(&set_display_monitors);
-
-                DispatcherTimer::new(Duration::from_millis(100), move || {
-                    let lock = session
-                        .lock()
-                        .unwrap_or_else(std::sync::PoisonError::into_inner);
-
-                    if lock.stop_requested {
-                        drop(lock);
-
-                        set_adjusting.call(false);
-
-                        return;
-                    }
-
-                    if lock.version != last_version.get() {
-                        last_version.set(lock.version);
-
-                        let updated = lock.monitors_with_working_y().into();
-
-                        drop(lock);
-
-                        set_display_monitors.call(updated);
-                    }
-                })
-                .ok()
-            };
-
-            let cleanp: Box<dyn FnOnce()> = {
-                let session = Rc::clone(&session);
-                let set_display = SetState::clone(&set_display_monitors);
-
-                Box::new(move || {
-                    drop(timer);
-
-                    overlay::destroy_remaining_overlays(&session);
-
-                    // Re-read actual OS positions so the overview reflects the final state.
-                    let fresh = discover::discover_monitors().into();
-
-                    // TODO assert fresh matches our state
-
-                    set_display.call(fresh);
-                })
-            };
-
-            Some(cleanp)
+        self.adjusting = Some(Adjusting {
+            session,
+            timer: schedule_poll(context),
+            last_version: 0,
         });
     }
 
-    let button_bar = {
-        grid((
-            {
-                let set_show_about = SetState::clone(&set_show_about);
+    fn stop_adjusting(&mut self) {
+        let Some(Adjusting { session, .. }) = self.adjusting.take() else {
+            return;
+        };
 
-                button("About")
-                    .on_click(move || set_show_about.call(true))
-                    .horizontal_alignment(HorizontalAlignment::Left)
-                    .grid_column(0)
-            },
-            hstack([
-                button(if adjusting { "Stop" } else { "Adjust" })
-                    .on_click(move || set_adjusting.call(!adjusting)),
-                button("Close").on_click(close_app),
-            ])
-            .spacing(8.0)
-            .horizontal_alignment(HorizontalAlignment::Right)
-            .grid_column(1),
-        ))
-        .columns([GridLength::STAR, GridLength::STAR])
-        .margin(Thickness::uniform(16.0))
-    };
+        overlay::destroy_remaining_overlays(&session);
 
-    let layout = grid((
-        overview_canvas(&display_monitors)
-            .horizontal_alignment(HorizontalAlignment::Center)
-            .margin(Thickness::uniform(16.0))
-            .grid_row(0),
-        info_panel(&display_monitors, on_resize)
-            .horizontal_alignment(HorizontalAlignment::Stretch)
-            .vertical_alignment(VerticalAlignment::Stretch)
-            .grid_row(1),
-        button_bar.grid_row(2),
-    ))
-    .rows([
-        GridLength::Pixel(200_f64),
-        GridLength::STAR,
-        GridLength::Auto,
-    ])
-    .horizontal_alignment(HorizontalAlignment::Stretch)
-    .vertical_alignment(VerticalAlignment::Stretch);
+        // Re-read actual OS positions so the overview reflects the final state.
+        // TODO assert fresh matches our state
+        self.display_monitors = discover::discover_monitors().into();
+    }
 
-    let children: Vec<Element> = vec![layout.into(), content_dialog(show_about, set_show_about)];
+    fn poll(&mut self, context: &ComponentContext<Self>) {
+        let Some(adjusting) = self.adjusting.as_mut() else {
+            return;
+        };
 
-    grid(children)
-        .horizontal_alignment(HorizontalAlignment::Stretch)
-        .vertical_alignment(VerticalAlignment::Stretch)
+        let lock = adjusting
+            .session
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner);
+
+        if lock.stop_requested {
+            drop(lock);
+
+            self.stop_adjusting();
+
+            return;
+        }
+
+        if lock.version != adjusting.last_version {
+            adjusting.last_version = lock.version;
+
+            self.display_monitors = lock.monitors_with_working_y().into();
+        }
+
+        drop(lock);
+
+        adjusting.timer = schedule_poll(context);
+    }
 }
 
-fn content_dialog(show_about: bool, set_about_close: SetState<bool>) -> Element {
+impl Component for MainWindow {
+    type Input = Arc<[Monitor]>;
+    type Message = Message;
+
+    fn create(input: &Self::Input, _context: &ComponentContext<Self>) -> Self {
+        Self {
+            monitors: Arc::clone(input),
+            display_monitors: Arc::clone(input),
+            adjusting: None,
+            show_about: false,
+            panel_probe: ElementRef::new(),
+        }
+    }
+
+    fn update(&mut self, message: Self::Message, context: &ComponentContext<Self>) {
+        match message {
+            Message::ToggleAdjusting if self.adjusting.is_some() => self.stop_adjusting(),
+            Message::ToggleAdjusting => self.start_adjusting(context),
+            Message::ShowAbout(show) => self.show_about = show,
+            Message::Poll => self.poll(context),
+            Message::Close => {
+                // We'll need to update this to revert the monitor alignment if we're
+                // within the timer timeout.
+                _ = context.window().request_close();
+            },
+        }
+    }
+
+    fn view(&self, _input: &Self::Input, context: &mut ViewContext<Self>) -> View {
+        context.window_title(WINDOW_TITLE);
+        context.window_visuals(WindowVisuals::new().client_size(570.0, 900.0));
+
+        context.use_effect("fixed-window", (), || {
+            // Once the UI mounts and the window is active, grab the HWND
+            // SAFETY: failure mode is returning `NULL`
+            let hwnd: HWND = unsafe { GetActiveWindow() };
+
+            if !hwnd.0.is_null() {
+                window_style::make_fixed(hwnd).expect("Failed to make window fixed");
+            }
+
+            None
+        });
+
+        let probe = self.panel_probe.clone();
+
+        context.use_effect("panel-size", (), move || {
+            let observation = probe.observe_composition_host(|event| match event {
+                CompositionHostEvent::Ready { width, height, .. }
+                | CompositionHostEvent::Metrics { width, height, .. } => on_resize(width, height),
+            });
+
+            Some(Box::new(move || drop(observation)))
+        });
+
+        let adjusting = self.adjusting.is_some();
+
+        let button_bar = Grid::new()
+            .columns([GridLength::STAR, GridLength::STAR])
+            .margin(Thickness::uniform(16.0))
+            .grid_row(2)
+            .children((
+                Button::new()
+                    .on_click(context.message(Message::ShowAbout(true)))
+                    .horizontal_alignment(HorizontalAlignment::Left)
+                    .grid_column(0)
+                    .content("About"),
+                StackPanel::new()
+                    .orientation(Orientation::Horizontal)
+                    .spacing(8.0)
+                    .horizontal_alignment(HorizontalAlignment::Right)
+                    .grid_column(1)
+                    .children((
+                        Button::new()
+                            .on_click(context.message(Message::ToggleAdjusting))
+                            .content(if adjusting { "Stop" } else { "Adjust" }),
+                        Button::new()
+                            .on_click(context.message(Message::Close))
+                            .content("Close"),
+                    )),
+            ));
+
+        let layout = Grid::new()
+            .rows([
+                GridLength::Pixel(200_f64),
+                GridLength::STAR,
+                GridLength::Auto,
+            ])
+            .horizontal_alignment(HorizontalAlignment::Stretch)
+            .vertical_alignment(VerticalAlignment::Stretch)
+            .children((
+                overview_canvas(&self.display_monitors)
+                    .horizontal_alignment(HorizontalAlignment::Center)
+                    .margin(Thickness::uniform(16.0))
+                    .grid_row(0),
+                // `info_panel` returns a `View`, which cannot take `grid_row`
+                Grid::new()
+                    .grid_row(1)
+                    .children([info_panel(&self.display_monitors, &self.panel_probe)]),
+                button_bar,
+            ));
+
+        Grid::new()
+            .horizontal_alignment(HorizontalAlignment::Stretch)
+            .vertical_alignment(VerticalAlignment::Stretch)
+            .children((layout, about_dialog(self.show_about, context)))
+    }
+}
+
+fn about_dialog(show_about: bool, context: &ViewContext<MainWindow>) -> View {
     let about_text = format!(
         "{} {}\n\n\
          {}\n\n\
@@ -180,18 +250,10 @@ fn content_dialog(show_about: bool, set_about_close: SetState<bool>) -> Element 
         env!("CARGO_PKG_REPOSITORY"),
     );
 
-    ContentDialog::new("About HwMonitorAlignment")
-        .content(about_text)
+    ContentDialog::new()
+        .title("About HwMonitorAlignment")
         .close_button_text("OK")
         .is_open(show_about)
-        .on_closed(move |_| set_about_close.call(false))
-        .into()
-}
-
-fn close_app() {
-    // SAFETY: instruct the UI broker to shut down.
-    // We'll need to update this to revert the monitor alignment if we're within the timer timeout.
-    unsafe {
-        PostQuitMessage(0);
-    }
+        .on_closed(context.callback(|_result| Message::ShowAbout(false)))
+        .content(about_text)
 }

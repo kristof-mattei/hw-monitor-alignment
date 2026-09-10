@@ -12,7 +12,7 @@ use windows_core::WIN32_ERROR;
 /// Make `hwnd` a fixed-size dialog.
 ///
 /// Why this is not unsafe: If `hwnd` is invalid the function remains safe.
-pub fn make_fixed(hwnd: HWND) -> Result<(), windows_reactor::Error> {
+pub fn make_fixed(hwnd: HWND) -> Result<(), windows_core::Error> {
     // SAFETY: Clear the error state before querying so we don't read stale errors.
     unsafe {
         SetLastError(0);
