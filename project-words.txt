@@ -1,4 +1,5 @@
 aarrggbb
+allgreen
 appgroup
 appuser
 argb
@@ -29,11 +30,11 @@ gdip
 gdiplus
 grcov
 gwlp
+headgreen
 hfont
 hgdiobj
 hresult
 hstring
-hubot
 hwnds
 idents
 inspectable
