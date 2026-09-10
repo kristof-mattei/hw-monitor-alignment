@@ -14,6 +14,8 @@ build = "src/build.rs"
 
 [features]
 default = []
+# Stage a private Windows App SDK runtime next to the executable.
+self-contained = ["dep:windows-reactor-setup"]
 
 [dependencies]
 hashbrown = "=0.17.1"
@@ -32,7 +34,7 @@ windows-reactor = { git = "https://github.com/microsoft/windows-rs", rev = "46fc
 [build-dependencies]
 windows-bindgen = { git = "https://github.com/microsoft/windows-rs", rev = "46fc13af0d96bb85f6ac1da24fd306984e50cf8d" }
 windows-rdl = { git = "https://github.com/microsoft/windows-rs", rev = "46fc13af0d96bb85f6ac1da24fd306984e50cf8d" }
-windows-reactor-setup = { git = "https://github.com/microsoft/windows-rs", rev = "46fc13af0d96bb85f6ac1da24fd306984e50cf8d" }
+windows-reactor-setup = { git = "https://github.com/microsoft/windows-rs", rev = "46fc13af0d96bb85f6ac1da24fd306984e50cf8d", optional = true }
 
 [dev-dependencies]
 pretty_assertions = "=1.4.1"

@@ -1,7 +1,8 @@
 use std::process::Command;
 
 fn main() {
-    windows_reactor_setup::as_framework_dependent();
+    #[cfg(feature = "self-contained")]
+    windows_reactor_setup::as_self_contained();
 
     let output_path = "src/bindings.rs";
 
