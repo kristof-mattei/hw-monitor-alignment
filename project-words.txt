@@ -8,7 +8,6 @@ blit
 borderless
 buildcache
 cinstrument
-cleanp
 cliffignore
 createstructw
 ctarget
@@ -32,11 +31,12 @@ grcov
 gwlp
 hfont
 hgdiobj
-hstack
+hresult
 hstring
 hubot
 hwnds
 idents
+inspectable
 invalidarg
 kristof
 libgit
@@ -95,7 +95,8 @@ usedefault
 usernamehw
 vadimcn
 viewbox
-vstack
+vtable
+vtbl
 windef
 winerror
 wingdi
