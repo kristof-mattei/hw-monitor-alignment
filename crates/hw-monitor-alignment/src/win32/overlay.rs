@@ -20,8 +20,7 @@ mod window;
 use std::sync::OnceLock;
 
 use windows::Win32::libloaderapi::GetModuleHandleW;
-use windows::Win32::minwindef::{LPARAM, WPARAM};
-use windows::Win32::windef::{COLORREF, HDC, HGDIOBJ, HICON, HWND};
+use windows::Win32::windef::{COLORREF, HDC, HICON, HWND};
 use windows::Win32::wingdi::{
     BitBlt, CreateCompatibleBitmap, CreateCompatibleDC, CreateSolidBrush, DeleteDC, DeleteObject,
     SRCCOPY, SelectObject,
@@ -40,7 +39,7 @@ const CLASS_NAME: &str = "HwMonitorAlignmentOverlay";
 
 /// `RGB` macro equivalent (windows-sys does not export one).
 const fn rgb(r: u8, g: u8, b: u8) -> COLORREF {
-    COLORREF((r as u32) | ((g as u32) << 8) | ((b as u32) << 16))
+    (r as u32) | ((g as u32) << 8) | ((b as u32) << 16)
 }
 
 /// Render into an off-screen bitmap and blit it to the window in one operation, so a
@@ -55,7 +54,7 @@ fn paint_double_buffered<F: FnOnce(HDC)>(hwnd: HWND, w: i32, h: i32, draw: F) {
 
         let bmp = CreateCompatibleBitmap(hdc, w, h);
 
-        let old = SelectObject(mem, HGDIOBJ(bmp.0));
+        let old = SelectObject(mem, bmp.cast());
 
         draw(mem);
 
@@ -63,7 +62,7 @@ fn paint_double_buffered<F: FnOnce(HDC)>(hwnd: HWND, w: i32, h: i32, draw: F) {
 
         SelectObject(mem, old);
 
-        DeleteObject(HGDIOBJ(bmp.0));
+        DeleteObject(bmp.cast());
 
         DeleteDC(mem);
 
@@ -105,7 +104,7 @@ fn stop_all(session: &SharedSession) {
     for val in hwnds {
         // SAFETY: PostMessageW is safe even if the window was already destroyed.
         unsafe {
-            PostMessageW(Some(val), WM_CLOSE.cast_unsigned(), WPARAM(0), LPARAM(0));
+            PostMessageW(Some(val), WM_CLOSE.cast_unsigned(), 0, 0);
         }
     }
 }
@@ -176,7 +175,7 @@ fn ensure_class_registered() -> bool {
         };
 
         // SAFETY: wc is fully initialized.
-        unsafe { RegisterClassExW(&raw const wc) }.0 != 0
+        (unsafe { RegisterClassExW(&raw const wc) }) != 0
     })
 }
 

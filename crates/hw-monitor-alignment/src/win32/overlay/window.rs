@@ -6,7 +6,7 @@ use std::rc::Rc;
 
 use windows::Win32::libloaderapi::GetModuleHandleW;
 use windows::Win32::minwindef::{LPARAM, LRESULT, WPARAM};
-use windows::Win32::windef::{HDC, HGDIOBJ, HWND, RECT};
+use windows::Win32::windef::{HDC, HWND, RECT};
 use windows::Win32::wingdi::{
     CreateSolidBrush, DEFAULT_GUI_FONT, DeleteObject, GetStockObject, SelectObject, SetBkMode,
     SetTextColor, TRANSPARENT,
@@ -136,7 +136,7 @@ fn paint(hdc: HDC, data: &OverlayData) {
 
         FillRect(hdc, &raw const rc, white);
 
-        DeleteObject(HGDIOBJ(white.0));
+        DeleteObject(white.cast());
 
         let graphics = {
             let mut graphics: *mut GpGraphics = std::ptr::null_mut();
@@ -285,14 +285,14 @@ pub(super) unsafe extern "system" fn overlay_wndproc(
 
     match msg {
         WM_NCCREATE => {
-            let cs = &*(lparam.0 as *const CREATESTRUCTW);
+            let cs = &*(lparam as *const CREATESTRUCTW);
 
             SetWindowLongPtrW(hwnd, GWLP_USERDATA, cs.lpCreateParams as isize);
 
             DefWindowProcW(hwnd, msg.cast_unsigned(), wparam, lparam)
         },
 
-        WM_ERASEBKGND => LRESULT(1), // the double-buffered WM_PAINT repaints fully, so skip the erase flash here
+        WM_ERASEBKGND => 1, // the double-buffered WM_PAINT repaints fully, so skip the erase flash here
 
         WM_PAINT => {
             let pointer = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *const OverlayData;
@@ -305,32 +305,32 @@ pub(super) unsafe extern "system" fn overlay_wndproc(
 
             paint_double_buffered(hwnd, data.monitor_w, data.monitor_h, |mem| paint(mem, data));
 
-            LRESULT(0)
+            0
         },
 
         WM_KEYDOWN | WM_SYSKEYDOWN => {
             let pointer = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut OverlayData;
 
             if pointer.is_null() {
-                return LRESULT(0);
+                return 0;
             }
 
-            handle_key(&mut *pointer, hwnd, i32::from(wparam.0 as u16));
+            handle_key(&mut *pointer, hwnd, i32::from(wparam as u16));
 
-            LRESULT(0)
+            0
         },
 
         WM_MOUSEMOVE => {
             let pointer = GetWindowLongPtrW(hwnd, GWLP_USERDATA) as *mut OverlayData;
 
             if pointer.is_null() {
-                return LRESULT(0);
+                return 0;
             }
 
             let data = &mut *pointer;
 
-            data.cursor_x = i32::from((lparam.0 & 0xFFFF) as i16);
-            data.cursor_y = i32::from(((lparam.0 >> 16) & 0xFFFF) as i16);
+            data.cursor_x = i32::from((lparam & 0xFFFF) as i16);
+            data.cursor_y = i32::from(((lparam >> 16) & 0xFFFF) as i16);
 
             let show = {
                 let lock = data
@@ -345,13 +345,13 @@ pub(super) unsafe extern "system" fn overlay_wndproc(
                 InvalidateRect(Some(hwnd), None, false);
             }
 
-            LRESULT(0)
+            0
         },
 
         WM_CLOSE => {
             DestroyWindow(hwnd);
 
-            LRESULT(0)
+            0
         },
 
         WM_DESTROY => {
@@ -363,7 +363,7 @@ pub(super) unsafe extern "system" fn overlay_wndproc(
                 drop(Box::from_raw(pointer));
             }
 
-            LRESULT(0)
+            0
         },
 
         _ => DefWindowProcW(hwnd, msg.cast_unsigned(), wparam, lparam),
@@ -412,7 +412,7 @@ pub(super) fn create_overlay_window(
         )
     };
 
-    if overlay.0.is_null() {
+    if overlay.is_null() {
         return Err(WIN32_ERROR::from_thread());
     }
 
