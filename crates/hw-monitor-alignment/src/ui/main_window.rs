@@ -22,10 +22,10 @@ const WINDOW_TITLE: &str = "HwMonitorAlignment";
 const POLL_INTERVAL: Duration = Duration::from_millis(100);
 
 fn on_resize(w: f64, h: f64) {
-    // SAFETY: failure mode is returning an `HWND` where `.is_invalid()` returns `true`.
+    // SAFETY: failure mode is returning a null `HWND`.
     let hwnd: HWND = unsafe { GetActiveWindow() };
 
-    if !hwnd.0.is_null() {
+    if !hwnd.is_null() {
         // SAFETY: `hwnd` is valid.
         unsafe {
             window_style::resize(hwnd, w, h).expect("Could not resize window");
@@ -160,7 +160,7 @@ impl Component for MainWindow {
             // SAFETY: failure mode is returning `NULL`
             let hwnd: HWND = unsafe { GetActiveWindow() };
 
-            if !hwnd.0.is_null() {
+            if !hwnd.is_null() {
                 window_style::make_fixed(hwnd).expect("Failed to make window fixed");
             }
 
