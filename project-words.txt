@@ -12,7 +12,6 @@ cinstrument
 cliffignore
 createstructw
 ctarget
-cves
 devicew
 devmode
 devmodew
@@ -32,7 +31,6 @@ grcov
 gwlp
 headgreen
 hfont
-hgdiobj
 hresult
 hstring
 hwnds
@@ -64,7 +62,6 @@ pcwstr
 pels
 pkgs
 postprocessors
-prereleased
 profraw
 pyflakes
 rawfile
