@@ -48,6 +48,7 @@ maximizebox
 minwindef
 monomorphization
 mousemove
+msvc
 multiplatform
 nccreate
 nextest
