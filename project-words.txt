@@ -46,6 +46,7 @@ lpsz
 mattei
 maximizebox
 minwindef
+mkhl
 monomorphization
 mousemove
 msvc
