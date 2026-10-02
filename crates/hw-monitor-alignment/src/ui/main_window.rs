@@ -5,10 +5,9 @@ use std::time::Duration;
 use windows::Win32::windef::HWND;
 use windows::Win32::winuser::GetActiveWindow;
 use windows_reactor::{
-    Button, ChildrenControl as _, Component, ComponentContext, ComponentTimer,
-    CompositionHostEvent, ContentControl as _, ContentDialog, ElementRef, Grid, GridChildExt as _,
-    GridLength, HorizontalAlignment, LayoutControl as _, Orientation, StackPanel, Thickness,
-    VerticalAlignment, View, ViewContext, WindowVisuals,
+    Button, Component, ComponentContext, ComponentTimer, CompositionHostEvent, ContentDialog,
+    ContentDialogExt as _, ElementRef, Grid, GridLength, HorizontalAlignment, Orientation,
+    StackPanel, Thickness, VerticalAlignment, View, ViewContext, WindowVisuals,
 };
 
 use super::info_panel::info_panel;
@@ -62,9 +61,7 @@ pub struct MainWindow {
 
 /// `set_timeout` is one-shot; each `Poll` schedules the next.
 fn schedule_poll(context: &ComponentContext<MainWindow>) -> ComponentTimer {
-    context
-        .set_timeout(POLL_INTERVAL, Message::Poll)
-        .expect("Could not schedule the session poll")
+    context.set_timeout(POLL_INTERVAL, Message::Poll)
 }
 
 impl MainWindow {
@@ -146,7 +143,7 @@ impl Component for MainWindow {
             Message::Close => {
                 // We'll need to update this to revert the monitor alignment if we're
                 // within the timer timeout.
-                _ = context.window().request_close();
+                _ = context.close_window();
             },
         }
     }
@@ -225,14 +222,11 @@ impl Component for MainWindow {
                 button_bar,
             ));
 
-        Grid::new()
-            .horizontal_alignment(HorizontalAlignment::Stretch)
-            .vertical_alignment(VerticalAlignment::Stretch)
-            .children((layout, about_dialog(self.show_about, context)))
+        layout.content_dialog(about_dialog(self.show_about, context))
     }
 }
 
-fn about_dialog(show_about: bool, context: &ViewContext<MainWindow>) -> View {
+fn about_dialog(show_about: bool, context: &ViewContext<MainWindow>) -> ContentDialog {
     let about_text = format!(
         "{} {}\n\n\
          {}\n\n\

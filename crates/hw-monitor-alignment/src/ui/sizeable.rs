@@ -1,7 +1,4 @@
-use windows_reactor::{
-    ChildrenControl as _, ElementRef, Grid, GridLength, HorizontalAlignment, LayoutControl as _,
-    VerticalAlignment, View,
-};
+use windows_reactor::{ElementRef, Grid, GridLength, HorizontalAlignment, VerticalAlignment, View};
 
 /// Wraps `child` so [`ElementRef::observe_composition_host`] on `probe` reports its size.
 pub fn sizeable<I: Into<View>>(child: I, probe: &ElementRef<Grid>) -> View {
@@ -21,4 +18,5 @@ pub fn sizeable<I: Into<View>>(child: I, probe: &ElementRef<Grid>) -> View {
         .columns([GridLength::Auto])
         .rows([GridLength::Auto])
         .children((child, host))
+        .into()
 }

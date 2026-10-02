@@ -1,6 +1,6 @@
 use windows_reactor::{
-    Canvas, CanvasChildExt as _, ChildrenControl as _, Color, Grid, HorizontalAlignment, KeyedView,
-    LayoutControl as _, Rectangle, Stretch, TextBlock, VerticalAlignment, Viewbox,
+    Canvas, Color, Grid, HorizontalAlignment, Rectangle, Stretch, TextBlock, VerticalAlignment,
+    View, Viewbox,
 };
 
 use crate::monitor::Monitor;
@@ -59,7 +59,7 @@ pub fn overview_canvas(monitors: &[Monitor]) -> Viewbox {
         return empty_scene();
     }
 
-    let mut children: Vec<KeyedView> = Vec::with_capacity(monitors.len() * 2);
+    let mut children: Vec<View> = Vec::with_capacity(monitors.len() * 2);
 
     for monitor in monitors {
         // normalize the positions in a (0, 0) -> (total_width, total_height) plane
@@ -86,10 +86,7 @@ pub fn overview_canvas(monitors: &[Monitor]) -> Viewbox {
             .canvas_left(x_offset)
             .canvas_top(y_offset);
 
-        children.push(KeyedView::new(
-            format!("rectangle {}", monitor.device_name),
-            monitor_rectangle,
-        ));
+        children.push(monitor_rectangle.into());
 
         // in the same position as the monitor rectangle we draw a grid
         // in the grid a textbox (auto centered because of the grid)
@@ -103,23 +100,20 @@ pub fn overview_canvas(monitors: &[Monitor]) -> Viewbox {
             .height(height)
             .canvas_left(x_offset)
             .canvas_top(y_offset)
-            .children([TextBlock::new()
+            .children((TextBlock::new()
                 .text(label)
                 .font_size(font_size)
                 .foreground(Color::rgb(245, 245, 245))
                 .horizontal_alignment(HorizontalAlignment::Center)
-                .vertical_alignment(VerticalAlignment::Center)]);
+                .vertical_alignment(VerticalAlignment::Center),));
 
-        children.push(KeyedView::new(
-            format!("label {}", monitor.device_name),
-            number,
-        ));
+        children.push(number.into());
     }
 
     let scene = Canvas::new()
         .width(total_width)
         .height(total_height)
-        .keyed_children(children);
+        .children(children);
 
     // the viewbox makes it so that the contents (the canvas) are scaled to the maximum boundaries
     Viewbox::new()
