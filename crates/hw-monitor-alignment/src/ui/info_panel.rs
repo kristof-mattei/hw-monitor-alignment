@@ -1,6 +1,6 @@
 use windows_reactor::{
-    Border, ChildrenControl as _, Color, ContentControl as _, ElementRef, FontWeight, Grid,
-    LayoutControl as _, Orientation, StackPanel, TextBlock, TextWrapping, Thickness, View,
+    Border, Color, ElementRef, FontWeight, Grid, Orientation, StackPanel, TextBlock, TextWrapping,
+    Thickness, View, keyed,
 };
 
 use crate::monitor::Monitor;
@@ -19,7 +19,7 @@ pub fn info_panel(monitors: &[Monitor], probe: &ElementRef<Grid>) -> View {
         .keyed_children(
             sorted
                 .into_iter()
-                .map(|m| (&*m.device_name, monitor_box(m))),
+                .map(|m| keyed(&*m.device_name, monitor_box(m))),
         );
 
     let outer = group_box("Monitor Setup Information", Thickness::xy(16.0, 0.0), boxes);
@@ -44,17 +44,20 @@ fn monitor_box(m: &Monitor) -> View {
 }
 
 fn field(caption: &str, value: &str) -> View {
-    StackPanel::new().spacing(0.0).children((
-        TextBlock::new().text(caption).font_size(11.0).opacity(0.6),
-        TextBlock::new()
-            .text(value)
-            .font_size(12.0)
-            .font_weight(FontWeight::BOLD)
-            .text_wrapping(TextWrapping::Wrap),
-    ))
+    StackPanel::new()
+        .spacing(0.0)
+        .children((
+            TextBlock::new().text(caption).font_size(11.0).opacity(0.6),
+            TextBlock::new()
+                .text(value)
+                .font_size(12.0)
+                .font_weight(FontWeight::BOLD)
+                .text_wrapping(TextWrapping::Wrap),
+        ))
+        .into()
 }
 
-fn group_box(title: &str, margin: Thickness, content: View) -> View {
+fn group_box(title: &str, margin: Thickness, content: impl Into<View>) -> View {
     Border::new()
         .border_brush(Color::rgb(90, 90, 90))
         .border_thickness(Thickness::uniform(1.0))
@@ -63,6 +66,7 @@ fn group_box(title: &str, margin: Thickness, content: View) -> View {
         .margin(margin)
         .content(StackPanel::new().spacing(4.0).children((
             TextBlock::new().text(title).font_size(11.0).opacity(0.7),
-            content,
+            content.into(),
         )))
+        .into()
 }
