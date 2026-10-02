@@ -21,6 +21,12 @@ const WINDOW_TITLE: &str = "HwMonitorAlignment";
 const POLL_INTERVAL: Duration = Duration::from_millis(100);
 
 fn on_resize(w: f64, h: f64) {
+    // on first pass we get 0.0, 0.0.
+    // in general these sizes are not real, so we ignore them.
+    if w <= 0.0 || h <= 0.0 {
+        return;
+    }
+
     // SAFETY: failure mode is returning a null `HWND`.
     let hwnd: HWND = unsafe { GetActiveWindow() };
 
